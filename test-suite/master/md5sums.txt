@@ -1,0 +1,3 @@
+e7bdd9ace6f71c21fadd56285a686bf7  test.in.spl
+14922fc387fddc6104dc5bd951b28656  t1_test.in.spl
+7fa0ae016d0f64dbca6a366674323e45  a1_test.in.spl

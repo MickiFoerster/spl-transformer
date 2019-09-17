@@ -1,0 +1,51 @@
+int n;
+double* x;
+double* t1_x;
+double* thread_result;
+double* t1_thread_result;
+int p;
+#pragma omp parallel
+{
+    int tests;
+    int i=0;
+    int j=0;
+    int tid=0;
+    double y;
+    double t1_y=0.;
+    double v0_from0;
+    double t1_v0_from0;
+    double v1_from0;
+    double t1_v1_from0;
+    double v2_from0;
+    double t1_v2_from0;
+    tid=omp_get_thread_num();
+    tests=0;
+    while(tests<repitions) {
+        t1_v0_from0=0.;
+        v0_from0=0.;
+        t1_y=t1_v0_from0;
+        y=v0_from0;
+        i=0;
+        j=0;
+        while(i<n) {
+            while(j<n) {
+                t1_v0_from0=t1_x[i];
+                v0_from0=x[i];
+                t1_v1_from0=t1_x[j];
+                v1_from0=x[j];
+                t1_v2_from0=t1_v0_from0*v1_from0+v0_from0*t1_v1_from0;
+                v2_from0=v0_from0*v1_from0;
+                t1_y+=t1_v2_from0;
+                y+=v2_from0;
+                j=j+1;
+            }
+            i=i+1;
+        }
+        t1_v0_from0=t1_y;
+        v0_from0=y;
+        t1_thread_result[tid]=t1_v0_from0;
+        thread_result[tid]=v0_from0;
+        dummy("", (void*)thread_result, (void*)t1_thread_result);
+        tests=tests+1;
+    }
+}

@@ -1,0 +1,19 @@
+unsigned int n;
+double *x;
+double *thread_result; 
+int p;
+Stackc a1_STACKc;
+Stacki a1_STACKi;
+Stackf a1_STACKf;
+#pragma omp threadprivate (a1_STACKc, a1_STACKi, a1_STACKf)
+#pragma omp parallel
+{
+	int tid;
+	tid=omp_get_thread_num();
+	if(tid==0) { thread_result[0]=0.; }
+#pragma omp barrier
+    a1_STACKf.push(thread_result[0]);
+	#pragma omp atomic
+	thread_result[0]+=x[0];
+	dummy("", thread_result);
+}

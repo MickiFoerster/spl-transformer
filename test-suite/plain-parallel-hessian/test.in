@@ -1,0 +1,35 @@
+unsigned int n;
+double *x; double *A;
+double *thread_result;
+#pragma omp parallel
+{
+	int tid=0;
+	int p=0;
+	int c=0;
+	int lb=0;
+	int ub=0;
+	int i=0;
+	int j=0;
+	double y;
+	double z;
+	tid=omp_get_thread_num();
+	p=omp_get_num_threads();
+	c=n/p;
+	lb=tid*c;  
+	ub=(tid+1)*c - 1;
+	i=lb;
+	thread_result[tid]=0.;
+	while(i<=ub) {
+		y=0.; 
+		z=0.;
+		j=0; 
+		while(j<n) {
+			y+=sin(A[i*n+j]*A[i*n+j]);
+			z+=cos(A[i*n+j]*A[i*n+j]);
+			j=j+1;
+		}
+		thread_result[tid]+=y*z;
+		i=i+1;
+	}
+	dummy("", (void*) thread_result);	
+}

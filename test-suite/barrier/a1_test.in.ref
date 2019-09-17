@@ -1,0 +1,255 @@
+double* x;
+double* a1_x;
+double* phi;
+double* a1_phi;
+double* constrain;
+double* a1_constrain;
+double L;
+double a1_L=0.;
+double* thread_result;
+double* a1_thread_result;
+int n;
+int nfourth;
+int m;
+Stackc a1_STACKc;
+Stacki a1_STACKi;
+Stackf a1_STACKf;
+#pragma omp threadprivate (a1_STACKc, a1_STACKi, a1_STACKf)
+#pragma omp parallel
+{
+    int tests=0;
+    double y;
+    double a1_y=0.;
+    int tid;
+    int p;
+    int c;
+    int i;
+    int lb;
+    int ub;
+    int nhalf;
+    double v0_from0;
+    double a1_v0_from0;
+    double v1_from0;
+    double a1_v1_from0;
+    double v2_from0;
+    double a1_v2_from0;
+    double v3_from0;
+    double a1_v3_from0;
+    while(tests<repition) {
+        a1_STACKc.push(45);
+        a1_STACKi.push(tid);
+        tid=omp_get_thread_num();
+        a1_STACKi.push(p);
+        p=omp_get_num_threads();
+        a1_STACKi.push(nhalf);
+        nhalf=n/2;
+        a1_STACKi.push(c);
+        c=nhalf/p;
+        a1_STACKi.push(i);
+        i=c*p;
+        if(i!=nhalf) {
+            a1_STACKc.push(72);
+            a1_STACKi.push(c);
+            c=c+1;
+        }
+        a1_STACKc.push(79);
+        a1_STACKi.push(lb);
+        lb=tid*c;
+        a1_STACKi.push(ub);
+        ub=(tid+1)*c-1;
+        if(ub>=nhalf) {
+            a1_STACKc.push(97);
+            a1_STACKi.push(ub);
+            ub=nhalf-1;
+        }
+        a1_STACKc.push(102);
+        a1_STACKi.push(i);
+        i=lb;
+        a1_STACKf.push(y);
+        y=0.;
+        while(i<=ub) {
+            a1_STACKc.push(116);
+            a1_STACKf.push(y);
+            y=y+sin(x[i]);
+            a1_STACKi.push(i);
+            i=i+1;
+        }
+        a1_STACKc.push(128);
+        a1_STACKf.push(thread_result[tid]);
+        thread_result[tid]=y;
+        a1_STACKf.push(y);
+        y=0.;
+        a1_STACKi.push(i);
+        i=0;
+        #pragma omp barrier
+        while(i<p) {
+            a1_STACKf.push(y);
+            #pragma omp atomic
+            y+=thread_result[i]
+            a1_STACKc.push(150);
+            a1_STACKi.push(i);
+            i=i+1;
+        }
+        a1_STACKc.push(152);
+        #pragma omp barrier
+        a1_STACKi.push(lb);
+        lb=nhalf+tid*c;
+        a1_STACKi.push(ub);
+        ub=nhalf+(tid+1)*c-1;
+        if(ub>=n) {
+            a1_STACKc.push(179);
+            a1_STACKi.push(ub);
+            ub=n-1;
+        }
+        a1_STACKc.push(184);
+        a1_STACKi.push(i);
+        i=lb;
+        while(i<=ub) {
+            a1_STACKc.push(195);
+            a1_STACKf.push(y);
+            y=y*sin(x[i]);
+            a1_STACKi.push(i);
+            i=i+1;
+        }
+        a1_STACKc.push(207);
+        a1_STACKf.push(thread_result[tid]);
+        thread_result[tid]=y;
+        #pragma omp barrier
+        a1_STACKi.push(tests);
+        tests=tests+1;
+        dummy("", (void*)thread_result, (void*)&y);
+    }
+    while(!a1_STACKc.empty()) {
+        if(a1_STACKc.top()==45) {
+            a1_STACKc.pop();
+            i=a1_STACKi.top();
+            a1_STACKi.pop();
+            c=a1_STACKi.top();
+            a1_STACKi.pop();
+            nhalf=a1_STACKi.top();
+            a1_STACKi.pop();
+            p=a1_STACKi.top();
+            a1_STACKi.pop();
+            tid=a1_STACKi.top();
+            a1_STACKi.pop();
+        }
+        if(a1_STACKc.top()==72) {
+            a1_STACKc.pop();
+            c=a1_STACKi.top();
+            a1_STACKi.pop();
+        }
+        if(a1_STACKc.top()==79) {
+            a1_STACKc.pop();
+            ub=a1_STACKi.top();
+            a1_STACKi.pop();
+            lb=a1_STACKi.top();
+            a1_STACKi.pop();
+        }
+        if(a1_STACKc.top()==97) {
+            a1_STACKc.pop();
+            ub=a1_STACKi.top();
+            a1_STACKi.pop();
+        }
+        if(a1_STACKc.top()==102) {
+            a1_STACKc.pop();
+            y=a1_STACKf.top();
+            a1_STACKf.pop();
+            v0_from0=0.;
+            a1_v0_from0=a1_y;
+            a1_y=0.;
+            i=a1_STACKi.top();
+            a1_STACKi.pop();
+        }
+        if(a1_STACKc.top()==116) {
+            a1_STACKc.pop();
+            i=a1_STACKi.top();
+            a1_STACKi.pop();
+            y=a1_STACKf.top();
+            a1_STACKf.pop();
+            v0_from0=y;
+            v1_from0=x[i];
+            v2_from0=sin(v1_from0);
+            v3_from0=v0_from0+v2_from0;
+            a1_v3_from0=a1_y;
+            a1_y=0.;
+            a1_v0_from0=a1_v3_from0;
+            a1_v2_from0=a1_v3_from0;
+            a1_y+=a1_v0_from0;
+            a1_v1_from0=a1_v2_from0*cos(v1_from0);
+            a1_x[i]+=a1_v1_from0;
+        }
+        if(a1_STACKc.top()==128) {
+            a1_STACKc.pop();
+            #pragma omp barrier
+            i=a1_STACKi.top();
+            a1_STACKi.pop();
+            y=a1_STACKf.top();
+            a1_STACKf.pop();
+            v0_from0=0.;
+            a1_v0_from0=a1_y;
+            a1_y=0.;
+            thread_result[tid]=a1_STACKf.top();
+            a1_STACKf.pop();
+            v0_from0=y;
+            a1_v0_from0=a1_thread_result[tid];
+            a1_thread_result[tid]=0.;
+            a1_y+=a1_v0_from0;
+        }
+        #pragma omp atomic
+        y+=thread_result[i]
+        if(a1_STACKc.top()==150) {
+            a1_STACKc.pop();
+            i=a1_STACKi.top();
+            a1_STACKi.pop();
+        }
+        if(a1_STACKc.top()==152) {
+            a1_STACKc.pop();
+            ub=a1_STACKi.top();
+            a1_STACKi.pop();
+            lb=a1_STACKi.top();
+            a1_STACKi.pop();
+            #pragma omp barrier
+        }
+        if(a1_STACKc.top()==179) {
+            a1_STACKc.pop();
+            ub=a1_STACKi.top();
+            a1_STACKi.pop();
+        }
+        if(a1_STACKc.top()==184) {
+            a1_STACKc.pop();
+            i=a1_STACKi.top();
+            a1_STACKi.pop();
+        }
+        if(a1_STACKc.top()==195) {
+            a1_STACKc.pop();
+            i=a1_STACKi.top();
+            a1_STACKi.pop();
+            y=a1_STACKf.top();
+            a1_STACKf.pop();
+            v0_from0=y;
+            v1_from0=x[i];
+            v2_from0=sin(v1_from0);
+            v3_from0=v0_from0*v2_from0;
+            a1_v3_from0=a1_y;
+            a1_y=0.;
+            a1_v0_from0=a1_v3_from0*v2_from0;
+            a1_v2_from0=a1_v3_from0*v0_from0;
+            a1_y+=a1_v0_from0;
+            a1_v1_from0=a1_v2_from0*cos(v1_from0);
+            a1_x[i]+=a1_v1_from0;
+        }
+        if(a1_STACKc.top()==207) {
+            a1_STACKc.pop();
+            tests=a1_STACKi.top();
+            a1_STACKi.pop();
+            #pragma omp barrier
+            thread_result[tid]=a1_STACKf.top();
+            a1_STACKf.pop();
+            v0_from0=y;
+            a1_v0_from0=a1_thread_result[tid];
+            a1_thread_result[tid]=0.;
+            a1_y+=a1_v0_from0;
+        }
+        dummy("", (void*)thread_result, (void*)&y, (void*)a1_thread_result, (void*)&a1_y);
+    }
+}

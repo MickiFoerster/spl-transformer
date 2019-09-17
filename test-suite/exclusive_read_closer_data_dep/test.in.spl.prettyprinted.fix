@@ -1,0 +1,38 @@
+int n;
+double* x;
+double* A;
+double* thread_result;
+#pragma omp parallel
+{
+  int tid/*@$\gets$@*/0;
+  int p/*@$\gets$@*/0;
+  int c/*@$\gets$@*/0;
+  int lb/*@$\gets$@*/0;
+  int ub/*@$\gets$@*/0;
+  int i/*@$\gets$@*/0;
+  int j/*@$\gets$@*/0;
+  int k/*@$\gets$@*/0;
+  double y;
+  double local_sum/*@$\gets$@*/0.;
+
+  tid/*@$\gets$@*/omp_get_thread_num();/*@ \label{lst:exclusive:read:closer:data:from:test:suite1} @*/
+  p/*@$\gets$@*/omp_get_num_threads();
+  c/*@$\gets$@*/n/p;
+  lb/*@$\gets$@*/tid*c;
+  ub/*@$\gets$@*/(tid+1)*c-1; /*@ \label{lst:exclusive:read:closer:data:from:test:suite2} @*/
+  i/*@$\gets$@*/lb;
+  thread_result/*@$_{tid}$@*//*@$\gets$@*/0.;
+  while(i /*@$\leq$@*/ ub) {
+    y/*@$\gets$@*/0.;
+    j/*@$\gets$@*/0;
+    k/*@$\gets$@*/n-5;
+    while(j /*@$\leq$@*/ k) {
+      y /*@$\gets$@*/ A/*@$_{i*n+j+4}\,$@*/*(x/*@$_{i}$@*/*x/*@$_{i}$@*/*x/*@$_{i}$@*/*x/*@$_{i}$@*/) + A/*@$_{i*n+j+3}\,$@*/*(x/*@$_{i}$@*/*x/*@$_{i}$@*/*x/*@$_{i}$@*/) /*@ \label{lst:exclusive:read:closer:data:from:test:suite3} @*/
+         + A/*@$_{i*n+j+2}\,$@*/*(x/*@$_{i}$@*/*x/*@$_{i}$@*/) + A/*@$_{i*n+j+1}\,$@*/*(x/*@$_{i}$@*/) + A/*@$_{i*n+j}$@*/; /*@ \label{lst:exclusive:read:closer:data:from:test:suite4} @*/
+      local_sum+/*@$\gets$@*/y;
+      j/*@$\gets$@*/j+1;
+    }
+    i/*@$\gets$@*/i+1;
+  }
+  thread_result/*@$_{tid}$@*/+/*@$\gets$@*/local_sum;
+}

@@ -1,0 +1,42 @@
+unsigned int n;
+double *x;
+double *A;
+double *thread_result;
+#pragma omp parallel
+{
+	int tid=0;
+	int p=0;
+	int c=0;
+	int lb=0;
+	int ub=0;
+	int i=0;
+	int j=0;
+	int k=0;
+	double y;
+	double local_sum=0.;
+
+	tid=omp_get_thread_num();
+	p=omp_get_num_threads();
+	c=n/p;
+	lb=tid*c;
+	ub=(tid+1)*c - 1;
+	i=lb;
+	thread_result[tid]=0.; 
+	while(i<=ub) {
+		y=0.;
+		j=0;
+		k=n-5;
+		while(j<=k) {
+			y =   A[i*n+j+4]*(x[i]*x[i]*x[i]*x[i]) /*@ \label{lst:exclusive:read:test:in} @*/   
+				+ A[i*n+j+3]*(x[i]*x[i]*x[i]) 
+				+ A[i*n+j+2]*(x[i]*x[i]) 
+				+ A[i*n+j+1]*(x[i]) 
+				+ A[i*n+j];
+			local_sum+=y;
+			j=j+1;
+		}
+		i=i+1;
+	}
+	thread_result[tid]+=local_sum; 
+}
+

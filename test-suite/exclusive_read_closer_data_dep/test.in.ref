@@ -1,0 +1,30 @@
+int n;
+double* x;
+double* thread_result;
+int p;
+#pragma omp parallel
+{
+    int tests;
+    int i=0;
+    int j=0;
+    int tid=0;
+    double y;
+    tid=omp_get_thread_num();
+    tests=0;
+    while(tests<repitions) {
+        y=0.;
+        i=0;
+        j=0;
+        while(i<n) {
+            while(j<n) {
+                #pragma ad exclusive read failure
+                y+=x[i]*x[j];
+                j=j+1;
+            }
+            i=i+1;
+        }
+        thread_result[tid]=y;
+        dummy("", (void*)thread_result);
+        tests=tests+1;
+    }
+}

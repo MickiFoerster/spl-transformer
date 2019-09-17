@@ -1,0 +1,404 @@
+================================================================================
+Node 0 (CFG_ENTRY):
+================================================================================
+
+
+================================================================================
+Node 6 (INT_DECLARATION):
+================================================================================
+
+
+================================================================================
+Node 8 (FLOAT_POINTER_DECLARATION):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+================================================================================
+
+
+================================================================================
+Node 10 (FLOAT_POINTER_DECLARATION):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+================================================================================
+
+
+================================================================================
+Node 12 (FLOAT_POINTER_DECLARATION):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+================================================================================
+
+
+================================================================================
+Node 233 (PARALLEL_REGION):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+================================================================================
+
+
+================================================================================
+Node 17 (INT_DECLARATION):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+================================================================================
+
+
+================================================================================
+Node 21 (INT_DECLARATION):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+Variable 'tid' defined in 7 (decl id:17) has value [ 0, 0 ].
+================================================================================
+
+
+================================================================================
+Node 25 (INT_DECLARATION):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+Variable 'tid' defined in 7 (decl id:17) has value [ 0, 0 ].
+Variable 'p' defined in 8 (decl id:21) has value [ 0, 0 ].
+================================================================================
+
+
+================================================================================
+Node 29 (INT_DECLARATION):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+Variable 'tid' defined in 7 (decl id:17) has value [ 0, 0 ].
+Variable 'p' defined in 8 (decl id:21) has value [ 0, 0 ].
+Variable 'c' defined in 9 (decl id:25) has value [ 0, 0 ].
+================================================================================
+
+
+================================================================================
+Node 33 (INT_DECLARATION):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+Variable 'tid' defined in 7 (decl id:17) has value [ 0, 0 ].
+Variable 'p' defined in 8 (decl id:21) has value [ 0, 0 ].
+Variable 'c' defined in 9 (decl id:25) has value [ 0, 0 ].
+Variable 'lb' defined in 10 (decl id:29) has value [ 0, 0 ].
+================================================================================
+
+
+================================================================================
+Node 37 (INT_DECLARATION):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+Variable 'tid' defined in 7 (decl id:17) has value [ 0, 0 ].
+Variable 'p' defined in 8 (decl id:21) has value [ 0, 0 ].
+Variable 'c' defined in 9 (decl id:25) has value [ 0, 0 ].
+Variable 'lb' defined in 10 (decl id:29) has value [ 0, 0 ].
+Variable 'ub' defined in 11 (decl id:33) has value [ 0, 0 ].
+================================================================================
+
+
+================================================================================
+Node 41 (INT_DECLARATION):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+Variable 'tid' defined in 7 (decl id:17) has value [ 0, 0 ].
+Variable 'p' defined in 8 (decl id:21) has value [ 0, 0 ].
+Variable 'c' defined in 9 (decl id:25) has value [ 0, 0 ].
+Variable 'lb' defined in 10 (decl id:29) has value [ 0, 0 ].
+Variable 'ub' defined in 11 (decl id:33) has value [ 0, 0 ].
+Variable 'i' defined in 12 (decl id:37) has value [ 0, 0 ].
+================================================================================
+
+
+================================================================================
+Node 45 (INT_DECLARATION):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+Variable 'tid' defined in 7 (decl id:17) has value [ 0, 0 ].
+Variable 'p' defined in 8 (decl id:21) has value [ 0, 0 ].
+Variable 'c' defined in 9 (decl id:25) has value [ 0, 0 ].
+Variable 'lb' defined in 10 (decl id:29) has value [ 0, 0 ].
+Variable 'ub' defined in 11 (decl id:33) has value [ 0, 0 ].
+Variable 'i' defined in 12 (decl id:37) has value [ 0, 0 ].
+Variable 'j' defined in 13 (decl id:41) has value [ 0, 0 ].
+================================================================================
+
+
+================================================================================
+Node 47 (FLOAT_DECLARATION):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+Variable 'tid' defined in 7 (decl id:17) has value [ 0, 0 ].
+Variable 'p' defined in 8 (decl id:21) has value [ 0, 0 ].
+Variable 'c' defined in 9 (decl id:25) has value [ 0, 0 ].
+Variable 'lb' defined in 10 (decl id:29) has value [ 0, 0 ].
+Variable 'ub' defined in 11 (decl id:33) has value [ 0, 0 ].
+Variable 'i' defined in 12 (decl id:37) has value [ 0, 0 ].
+Variable 'j' defined in 13 (decl id:41) has value [ 0, 0 ].
+Variable 'k' defined in 14 (decl id:45) has value [ 0, 0 ].
+================================================================================
+
+
+================================================================================
+Node 50 (SPL_int_assign):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+Variable 'tid' defined in 7 (decl id:17) has value [ 0, 0 ].
+Variable 'p' defined in 8 (decl id:21) has value [ 0, 0 ].
+Variable 'c' defined in 9 (decl id:25) has value [ 0, 0 ].
+Variable 'lb' defined in 10 (decl id:29) has value [ 0, 0 ].
+Variable 'ub' defined in 11 (decl id:33) has value [ 0, 0 ].
+Variable 'i' defined in 12 (decl id:37) has value [ 0, 0 ].
+Variable 'j' defined in 13 (decl id:41) has value [ 0, 0 ].
+Variable 'k' defined in 14 (decl id:45) has value [ 0, 0 ].
+================================================================================
+
+
+================================================================================
+Node 54 (SPL_int_assign):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+Variable 'tid' defined in 7 (decl id:17) has value [ THREAD_ID, THREAD_ID ].
+Variable 'p' defined in 8 (decl id:21) has value [ 0, 0 ].
+Variable 'c' defined in 9 (decl id:25) has value [ 0, 0 ].
+Variable 'lb' defined in 10 (decl id:29) has value [ 0, 0 ].
+Variable 'ub' defined in 11 (decl id:33) has value [ 0, 0 ].
+Variable 'i' defined in 12 (decl id:37) has value [ 0, 0 ].
+Variable 'j' defined in 13 (decl id:41) has value [ 0, 0 ].
+Variable 'k' defined in 14 (decl id:45) has value [ 0, 0 ].
+================================================================================
+
+
+================================================================================
+Node 59 (SPL_int_assign):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+Variable 'tid' defined in 7 (decl id:17) has value [ THREAD_ID, THREAD_ID ].
+Variable 'p' defined in 8 (decl id:21) has value [ NUM_OF_THREADS, NUM_OF_THREADS ].
+Variable 'c' defined in 9 (decl id:25) has value [ 0, 0 ].
+Variable 'lb' defined in 10 (decl id:29) has value [ 0, 0 ].
+Variable 'ub' defined in 11 (decl id:33) has value [ 0, 0 ].
+Variable 'i' defined in 12 (decl id:37) has value [ 0, 0 ].
+Variable 'j' defined in 13 (decl id:41) has value [ 0, 0 ].
+Variable 'k' defined in 14 (decl id:45) has value [ 0, 0 ].
+================================================================================
+
+
+================================================================================
+Node 64 (SPL_int_assign):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+Variable 'tid' defined in 7 (decl id:17) has value [ THREAD_ID, THREAD_ID ].
+Variable 'p' defined in 8 (decl id:21) has value [ NUM_OF_THREADS, NUM_OF_THREADS ].
+Variable 'c' defined in 9 (decl id:25) has value [ n/NUM_OF_THREADS, n/NUM_OF_THREADS ].
+Variable 'lb' defined in 10 (decl id:29) has value [ 0, 0 ].
+Variable 'ub' defined in 11 (decl id:33) has value [ 0, 0 ].
+Variable 'i' defined in 12 (decl id:37) has value [ 0, 0 ].
+Variable 'j' defined in 13 (decl id:41) has value [ 0, 0 ].
+Variable 'k' defined in 14 (decl id:45) has value [ 0, 0 ].
+================================================================================
+
+
+================================================================================
+Node 74 (SPL_int_assign):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+Variable 'tid' defined in 7 (decl id:17) has value [ THREAD_ID, THREAD_ID ].
+Variable 'p' defined in 8 (decl id:21) has value [ NUM_OF_THREADS, NUM_OF_THREADS ].
+Variable 'c' defined in 9 (decl id:25) has value [ n/NUM_OF_THREADS, n/NUM_OF_THREADS ].
+Variable 'lb' defined in 10 (decl id:29) has value [ THREAD_ID*(n/NUM_OF_THREADS), THREAD_ID*(n/NUM_OF_THREADS) ].
+Variable 'ub' defined in 11 (decl id:33) has value [ 0, 0 ].
+Variable 'i' defined in 12 (decl id:37) has value [ 0, 0 ].
+Variable 'j' defined in 13 (decl id:41) has value [ 0, 0 ].
+Variable 'k' defined in 14 (decl id:45) has value [ 0, 0 ].
+================================================================================
+
+
+================================================================================
+Node 77 (SPL_int_assign):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+Variable 'tid' defined in 7 (decl id:17) has value [ THREAD_ID, THREAD_ID ].
+Variable 'p' defined in 8 (decl id:21) has value [ NUM_OF_THREADS, NUM_OF_THREADS ].
+Variable 'c' defined in 9 (decl id:25) has value [ n/NUM_OF_THREADS, n/NUM_OF_THREADS ].
+Variable 'lb' defined in 10 (decl id:29) has value [ THREAD_ID*(n/NUM_OF_THREADS), THREAD_ID*(n/NUM_OF_THREADS) ].
+Variable 'ub' defined in 11 (decl id:33) has value [ ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1, ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1 ].
+Variable 'i' defined in 12 (decl id:37) has value [ 0, 0 ].
+Variable 'j' defined in 13 (decl id:41) has value [ 0, 0 ].
+Variable 'k' defined in 14 (decl id:45) has value [ 0, 0 ].
+================================================================================
+
+
+================================================================================
+Node 82 (SPL_float_assign):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+Variable 'tid' defined in 7 (decl id:17) has value [ THREAD_ID, THREAD_ID ].
+Variable 'p' defined in 8 (decl id:21) has value [ NUM_OF_THREADS, NUM_OF_THREADS ].
+Variable 'c' defined in 9 (decl id:25) has value [ n/NUM_OF_THREADS, n/NUM_OF_THREADS ].
+Variable 'lb' defined in 10 (decl id:29) has value [ THREAD_ID*(n/NUM_OF_THREADS), THREAD_ID*(n/NUM_OF_THREADS) ].
+Variable 'ub' defined in 11 (decl id:33) has value [ ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1, ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1 ].
+Variable 'i' defined in 12 (decl id:37) has value [ THREAD_ID*(n/NUM_OF_THREADS), THREAD_ID*(n/NUM_OF_THREADS) ].
+Variable 'j' defined in 13 (decl id:41) has value [ 0, 0 ].
+Variable 'k' defined in 14 (decl id:45) has value [ 0, 0 ].
+================================================================================
+
+
+================================================================================
+Node 232 (SPL_cond_while):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+Variable 'tid' defined in 7 (decl id:17) has value [ THREAD_ID, THREAD_ID ].
+Variable 'p' defined in 8 (decl id:21) has value [ NUM_OF_THREADS, NUM_OF_THREADS ].
+Variable 'c' defined in 9 (decl id:25) has value [ n/NUM_OF_THREADS, n/NUM_OF_THREADS ].
+Variable 'lb' defined in 10 (decl id:29) has value [ THREAD_ID*(n/NUM_OF_THREADS), THREAD_ID*(n/NUM_OF_THREADS) ].
+Variable 'ub' defined in 11 (decl id:33) has value [ ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1, ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1 ].
+Variable 'i' defined in 12 (decl id:37) has value [ THREAD_ID*(n/NUM_OF_THREADS), PLUS_INFINITY ].
+Variable 'j' defined in 13 (decl id:41) has value [ 0, n ].
+Variable 'k' defined in 14 (decl id:45) has value [ 0, n-5 ].
+================================================================================
+
+
+================================================================================
+Node 88 (SPL_float_assign):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+Variable 'tid' defined in 7 (decl id:17) has value [ THREAD_ID, THREAD_ID ].
+Variable 'p' defined in 8 (decl id:21) has value [ NUM_OF_THREADS, NUM_OF_THREADS ].
+Variable 'c' defined in 9 (decl id:25) has value [ n/NUM_OF_THREADS, n/NUM_OF_THREADS ].
+Variable 'lb' defined in 10 (decl id:29) has value [ THREAD_ID*(n/NUM_OF_THREADS), THREAD_ID*(n/NUM_OF_THREADS) ].
+Variable 'ub' defined in 11 (decl id:33) has value [ ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1, ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1 ].
+Variable 'i' defined in 12 (decl id:37) has value [ THREAD_ID*(n/NUM_OF_THREADS), ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1 ].
+Variable 'j' defined in 13 (decl id:41) has value [ 0, n ].
+Variable 'k' defined in 14 (decl id:45) has value [ 0, n-5 ].
+list of assertions:
+  1. 'i<=ub'
+================================================================================
+
+
+================================================================================
+Node 92 (SPL_int_assign):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+Variable 'tid' defined in 7 (decl id:17) has value [ THREAD_ID, THREAD_ID ].
+Variable 'p' defined in 8 (decl id:21) has value [ NUM_OF_THREADS, NUM_OF_THREADS ].
+Variable 'c' defined in 9 (decl id:25) has value [ n/NUM_OF_THREADS, n/NUM_OF_THREADS ].
+Variable 'lb' defined in 10 (decl id:29) has value [ THREAD_ID*(n/NUM_OF_THREADS), THREAD_ID*(n/NUM_OF_THREADS) ].
+Variable 'ub' defined in 11 (decl id:33) has value [ ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1, ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1 ].
+Variable 'i' defined in 12 (decl id:37) has value [ THREAD_ID*(n/NUM_OF_THREADS), ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1 ].
+Variable 'j' defined in 13 (decl id:41) has value [ 0, n ].
+Variable 'k' defined in 14 (decl id:45) has value [ 0, n-5 ].
+================================================================================
+
+
+================================================================================
+Node 97 (SPL_int_assign):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+Variable 'tid' defined in 7 (decl id:17) has value [ THREAD_ID, THREAD_ID ].
+Variable 'p' defined in 8 (decl id:21) has value [ NUM_OF_THREADS, NUM_OF_THREADS ].
+Variable 'c' defined in 9 (decl id:25) has value [ n/NUM_OF_THREADS, n/NUM_OF_THREADS ].
+Variable 'lb' defined in 10 (decl id:29) has value [ THREAD_ID*(n/NUM_OF_THREADS), THREAD_ID*(n/NUM_OF_THREADS) ].
+Variable 'ub' defined in 11 (decl id:33) has value [ ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1, ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1 ].
+Variable 'i' defined in 12 (decl id:37) has value [ THREAD_ID*(n/NUM_OF_THREADS), ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1 ].
+Variable 'j' defined in 13 (decl id:41) has value [ 0, 0 ].
+Variable 'k' defined in 14 (decl id:45) has value [ 0, n-5 ].
+================================================================================
+
+
+================================================================================
+Node 226 (SPL_cond_while):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+Variable 'tid' defined in 7 (decl id:17) has value [ THREAD_ID, THREAD_ID ].
+Variable 'p' defined in 8 (decl id:21) has value [ NUM_OF_THREADS, NUM_OF_THREADS ].
+Variable 'c' defined in 9 (decl id:25) has value [ n/NUM_OF_THREADS, n/NUM_OF_THREADS ].
+Variable 'lb' defined in 10 (decl id:29) has value [ THREAD_ID*(n/NUM_OF_THREADS), THREAD_ID*(n/NUM_OF_THREADS) ].
+Variable 'ub' defined in 11 (decl id:33) has value [ ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1, ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1 ].
+Variable 'i' defined in 12 (decl id:37) has value [ THREAD_ID*(n/NUM_OF_THREADS), ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1 ].
+Variable 'j' defined in 13 (decl id:41) has value [ 0, n ].
+Variable 'k' defined in 14 (decl id:45) has value [ n-5, n-5 ].
+================================================================================
+
+
+================================================================================
+Node 207 (SPL_float_assign):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+Variable 'tid' defined in 7 (decl id:17) has value [ THREAD_ID, THREAD_ID ].
+Variable 'p' defined in 8 (decl id:21) has value [ NUM_OF_THREADS, NUM_OF_THREADS ].
+Variable 'c' defined in 9 (decl id:25) has value [ n/NUM_OF_THREADS, n/NUM_OF_THREADS ].
+Variable 'lb' defined in 10 (decl id:29) has value [ THREAD_ID*(n/NUM_OF_THREADS), THREAD_ID*(n/NUM_OF_THREADS) ].
+Variable 'ub' defined in 11 (decl id:33) has value [ ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1, ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1 ].
+Variable 'i' defined in 12 (decl id:37) has value [ THREAD_ID*(n/NUM_OF_THREADS), ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1 ].
+Variable 'j' defined in 13 (decl id:41) has value [ 0, n-5 ].
+Variable 'k' defined in 14 (decl id:45) has value [ n-5, n-5 ].
+list of assertions:
+  1. 'j<=k'
+================================================================================
+
+
+================================================================================
+Node 220 (SPL_cond_if):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+Variable 'tid' defined in 7 (decl id:17) has value [ THREAD_ID, THREAD_ID ].
+Variable 'p' defined in 8 (decl id:21) has value [ NUM_OF_THREADS, NUM_OF_THREADS ].
+Variable 'c' defined in 9 (decl id:25) has value [ n/NUM_OF_THREADS, n/NUM_OF_THREADS ].
+Variable 'lb' defined in 10 (decl id:29) has value [ THREAD_ID*(n/NUM_OF_THREADS), THREAD_ID*(n/NUM_OF_THREADS) ].
+Variable 'ub' defined in 11 (decl id:33) has value [ ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1, ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1 ].
+Variable 'i' defined in 12 (decl id:37) has value [ THREAD_ID*(n/NUM_OF_THREADS), ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1 ].
+Variable 'j' defined in 13 (decl id:41) has value [ 0, n-5 ].
+Variable 'k' defined in 14 (decl id:45) has value [ n-5, n-5 ].
+================================================================================
+
+
+================================================================================
+Node 218 (SPL_float_assign):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+Variable 'tid' defined in 7 (decl id:17) has value [ THREAD_ID, THREAD_ID ].
+Variable 'p' defined in 8 (decl id:21) has value [ NUM_OF_THREADS, NUM_OF_THREADS ].
+Variable 'c' defined in 9 (decl id:25) has value [ n/NUM_OF_THREADS, n/NUM_OF_THREADS ].
+Variable 'lb' defined in 10 (decl id:29) has value [ THREAD_ID*(n/NUM_OF_THREADS), THREAD_ID*(n/NUM_OF_THREADS) ].
+Variable 'ub' defined in 11 (decl id:33) has value [ ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1, ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1 ].
+Variable 'i' defined in 12 (decl id:37) has value [ THREAD_ID*(n/NUM_OF_THREADS), ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1 ].
+Variable 'j' defined in 13 (decl id:41) has value [ 0, n-5 ].
+Variable 'k' defined in 14 (decl id:45) has value [ n-5, n-5 ].
+list of assertions:
+  1. '(thread_result)<y'
+================================================================================
+
+
+================================================================================
+Node 225 (SPL_int_assign):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+Variable 'tid' defined in 7 (decl id:17) has value [ THREAD_ID, THREAD_ID ].
+Variable 'p' defined in 8 (decl id:21) has value [ NUM_OF_THREADS, NUM_OF_THREADS ].
+Variable 'c' defined in 9 (decl id:25) has value [ n/NUM_OF_THREADS, n/NUM_OF_THREADS ].
+Variable 'lb' defined in 10 (decl id:29) has value [ THREAD_ID*(n/NUM_OF_THREADS), THREAD_ID*(n/NUM_OF_THREADS) ].
+Variable 'ub' defined in 11 (decl id:33) has value [ ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1, ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1 ].
+Variable 'i' defined in 12 (decl id:37) has value [ THREAD_ID*(n/NUM_OF_THREADS), ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1 ].
+Variable 'j' defined in 13 (decl id:41) has value [ 0, n-5 ].
+Variable 'k' defined in 14 (decl id:45) has value [ n-5, n-5 ].
+list of assertions:
+  1. '(thread_result)>=y'
+================================================================================
+
+
+================================================================================
+Node 231 (SPL_int_assign):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+Variable 'tid' defined in 7 (decl id:17) has value [ THREAD_ID, THREAD_ID ].
+Variable 'p' defined in 8 (decl id:21) has value [ NUM_OF_THREADS, NUM_OF_THREADS ].
+Variable 'c' defined in 9 (decl id:25) has value [ n/NUM_OF_THREADS, n/NUM_OF_THREADS ].
+Variable 'lb' defined in 10 (decl id:29) has value [ THREAD_ID*(n/NUM_OF_THREADS), THREAD_ID*(n/NUM_OF_THREADS) ].
+Variable 'ub' defined in 11 (decl id:33) has value [ ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1, ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1 ].
+Variable 'i' defined in 12 (decl id:37) has value [ THREAD_ID*(n/NUM_OF_THREADS), ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1 ].
+Variable 'j' defined in 13 (decl id:41) has value [ 0, n ].
+Variable 'k' defined in 14 (decl id:45) has value [ n-5, n-5 ].
+list of assertions:
+  1. 'j>k'
+================================================================================
+
+
+================================================================================
+Node 1 (CFG_EXIT):
+Variable 'n' defined in 1 (decl id:6) has value [ n, n ].
+Variable 'tid' defined in 7 (decl id:17) has value [ THREAD_ID, THREAD_ID ].
+Variable 'p' defined in 8 (decl id:21) has value [ NUM_OF_THREADS, NUM_OF_THREADS ].
+Variable 'c' defined in 9 (decl id:25) has value [ n/NUM_OF_THREADS, n/NUM_OF_THREADS ].
+Variable 'lb' defined in 10 (decl id:29) has value [ THREAD_ID*(n/NUM_OF_THREADS), THREAD_ID*(n/NUM_OF_THREADS) ].
+Variable 'ub' defined in 11 (decl id:33) has value [ ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1, ((THREAD_ID+1)*(n/NUM_OF_THREADS))-1 ].
+Variable 'i' defined in 12 (decl id:37) has value [ THREAD_ID*(n/NUM_OF_THREADS), PLUS_INFINITY ].
+Variable 'j' defined in 13 (decl id:41) has value [ 0, n ].
+Variable 'k' defined in 14 (decl id:45) has value [ 0, n-5 ].
+list of assertions:
+  1. 'i>ub'
+================================================================================
+
+
+Read access 102 in float-assignment 207 (line 33) represents       A[((i*n)+j)+4] type(SPL_identifier) : exclusive read: no
+Read access 114 in float-assignment 207 (line 33) represents                 x[i] type(SPL_identifier) : exclusive read: yes
+Read access 117 in float-assignment 207 (line 33) represents                 x[i] type(SPL_identifier) : exclusive read: yes
+Read access 121 in float-assignment 207 (line 33) represents                 x[i] type(SPL_identifier) : exclusive read: yes
+Read access 125 in float-assignment 207 (line 33) represents                 x[i] type(SPL_identifier) : exclusive read: yes
+Read access 131 in float-assignment 207 (line 33) represents       A[((i*n)+j)+3] type(SPL_identifier) : exclusive read: no
+Read access 143 in float-assignment 207 (line 33) represents                 x[i] type(SPL_identifier) : exclusive read: yes
+Read access 146 in float-assignment 207 (line 33) represents                 x[i] type(SPL_identifier) : exclusive read: yes
+Read access 150 in float-assignment 207 (line 33) represents                 x[i] type(SPL_identifier) : exclusive read: yes
+Read access 157 in float-assignment 207 (line 33) represents       A[((i*n)+j)+2] type(SPL_identifier) : exclusive read: no
+Read access 169 in float-assignment 207 (line 33) represents                 x[i] type(SPL_identifier) : exclusive read: yes
+Read access 172 in float-assignment 207 (line 33) represents                 x[i] type(SPL_identifier) : exclusive read: yes
+Read access 179 in float-assignment 207 (line 33) represents       A[((i*n)+j)+1] type(SPL_identifier) : exclusive read: no
+Read access 191 in float-assignment 207 (line 33) represents                 x[i] type(SPL_identifier) : exclusive read: yes
+Read access 197 in float-assignment 207 (line 33) represents           A[(i*n)+j] type(SPL_identifier) : exclusive read: no
+Read access 217 in float-assignment 218 (line 35) represents                    y type(SPL_identifier) : exclusive read: yes

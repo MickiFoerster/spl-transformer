@@ -1,0 +1,12 @@
+GCC_VERSION=4.8.0
+GCC_BASENAME=$(shell if [ -f $$HOME/programs/gcc-$(GCC_VERSION)/bin/g++-$(GCC_VERSION) ];then printf "$$HOME/programs/gcc-$(GCC_VERSION)/bin/g++-$(GCC_VERSION)";else echo "$$HOME/workspace/external-projects/gcc-$(GCC_VERSION)/bld/bin/g++-$(GCC_VERSION)";fi)
+GCC_BASE_DIR=$(shell if [ -f $$HOME/programs/gcc-$(GCC_VERSION)/bin/g++-$(GCC_VERSION) ];then printf "$$HOME/programs/gcc-$(GCC_VERSION)";else echo "$$HOME/workspace/external-projects/gcc-$(GCC_VERSION)/bld";fi)
+GCC_INCLUDE=-I$(GCC_BASE_DIR)/include/c++/$(GCC_VERSION)
+GCC_LDFLAGS=-L$(GCC_BASE_DIR)/lib64
+GCC_LIB_PATH=$(GCC_BASE_DIR)/lib64
+O0_FLAGS=$(shell if [ -n "`icpc 2>&1 | egrep '^icpc: command line error'`" ];then echo "-g -O0";else echo "-g -gdwarf-2 -O0";fi) 
+O3_FLAGS=-O3
+CXX=$(shell if [ -n "`icpc 2>&1 | egrep '^icpc: command line error'`" ];then echo icpc;else echo $(GCC_BASENAME);fi)
+CXXFLAGS=$(shell if [ -n "`icpc 2>&1 | egrep '^icpc: command line error'`" ];then echo -openmp;else echo -fopenmp;fi) $(GCC_INCLUDE)
+LDFLAGS=$(GCC_LDFLAGS)
+LD_LIBRARY_PATH=$(GCC_LIB_PATH):$(PAPISRC):$(PAPISRC)/libpfm4/lib:$(INTEL_LIB_PATH)

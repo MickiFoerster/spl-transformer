@@ -1,0 +1,38 @@
+unsigned int n;
+double *x;
+double *thread_result;
+#pragma omp parallel
+{
+	int tid=0;
+	int p=0;
+	int c=0;
+	int lb=0;
+	int ub=0;
+	int i=0;
+	int j;
+	double y=0.;
+
+	tid=omp_get_thread_num();
+	p=omp_get_num_threads();
+	c=n/p;
+	i=c*p;
+	if(i!=n) { c=c+1; }
+	lb=tid*c;
+	ub=(tid+1)*c-1;
+	if(ub>=n) { ub=n-1; }
+	i=lb;
+	while(i<=ub) {
+		j=0;
+		y=1+x[i];
+		while(j<2) { // Compute x[i]^3
+			y=y*x[i];
+			j=j+1;
+		}	
+		y=y*sin(x[i]);
+		y=y*cos(x[i]);
+		y=y*exp(x[i]);
+		y=(sin(x[i]))+(cos(x[i]));
+		y=(sin(x[i]))-(cos(x[i]));
+		if(i<p) { thread_result[i]=y; }
+	}
+}

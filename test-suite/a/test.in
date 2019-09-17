@@ -1,0 +1,26 @@
+// Diskretisierung der Gleichung u'(t,x) = t*u(t,x) 
+
+unsigned int n;
+double *u_next;
+double *du_dx;
+double *u_cur; 
+double h;
+#pragma omp parallel
+{
+	int tid=0;
+	int p=0;
+	int c=0;
+	int lb=0;
+	int ub=0;
+	int i=0;
+	tid=omp_get_thread_num();
+	p=omp_get_num_threads();
+	c=n/p;
+	lb=tid*c;  
+	ub=(tid+1)*c - 1;
+	i=lb;
+	while(i<=ub) {
+		du_dx[i] = u_cur[i-1] + u_cur[i+1] * 2*h;
+		i=i+1;
+	}
+}

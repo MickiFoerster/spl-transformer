@@ -1,0 +1,106 @@
+double* x;
+double* t1_x;
+double* thread_result;
+double* t1_thread_result;
+int n;
+int m;
+#pragma omp parallel
+{
+    int tests=0;
+    int tid=0;
+    int p=0;
+    int i=0;
+    int lb=0;
+    int ub=0;
+    int c=0;
+    double y=0.;
+    double t1_y=0.;
+    double v0_from0;
+    double t1_v0_from0;
+    double v1_from0;
+    double t1_v1_from0;
+    double v2_from0;
+    double t1_v2_from0;
+    double v3_from0;
+    double t1_v3_from0;
+    double v4_from0;
+    double t1_v4_from0;
+    double v5_from0;
+    double t1_v5_from0;
+    double v6_from0;
+    double t1_v6_from0;
+    double v7_from0;
+    double t1_v7_from0;
+    double v8_from0;
+    double t1_v8_from0;
+    double v9_from0;
+    double t1_v9_from0;
+    double v10_from0;
+    double t1_v10_from0;
+    tid=omp_get_thread_num();
+    p=omp_get_num_threads();
+    c=n/p;
+    i=c*p;
+    if(i!=n) {
+        c=c+1;
+    }
+    lb=tid*c;
+    ub=(tid+1)*c-1;
+    if(ub>=n) {
+        ub=n-1;
+    }
+    i=lb;
+    t1_v0_from0=0.;
+    v0_from0=1.;
+    t1_y=t1_v0_from0;
+    y=v0_from0;
+    while(i<=ub) {
+        t1_v0_from0=t1_y;
+        v0_from0=y;
+        t1_v1_from0=t1_x[i];
+        v1_from0=x[i];
+        t1_v2_from0=t1_x[i];
+        v2_from0=x[i];
+        t1_v3_from0=t1_v1_from0*v2_from0+v1_from0*t1_v2_from0;
+        v3_from0=v1_from0*v2_from0;
+        t1_v4_from0=t1_v3_from0*cos(v3_from0);
+        v4_from0=sin(v3_from0);
+        t1_v5_from0=t1_v0_from0*v4_from0+v0_from0*t1_v4_from0;
+        v5_from0=v0_from0*v4_from0;
+        t1_v6_from0=t1_x[i];
+        v6_from0=x[i];
+        t1_v7_from0=t1_x[i];
+        v7_from0=x[i];
+        t1_v8_from0=t1_v6_from0*v7_from0+v6_from0*t1_v7_from0;
+        v8_from0=v6_from0*v7_from0;
+        t1_v9_from0=t1_v8_from0*(0.-sin(v8_from0));
+        v9_from0=cos(v8_from0);
+        t1_v10_from0=t1_v5_from0*v9_from0+v5_from0*t1_v9_from0;
+        v10_from0=v5_from0*v9_from0;
+        t1_y=t1_v10_from0;
+        y=v10_from0;
+        i=i+1;
+    }
+    t1_v0_from0=t1_y;
+    v0_from0=y;
+    t1_thread_result[tid]=t1_v0_from0;
+    thread_result[tid]=v0_from0;
+    #pragma omp barrier
+    #pragma omp master
+    {
+        i=1;
+        while(i<p) {
+            t1_v0_from0=t1_thread_result[0];
+            v0_from0=thread_result[0];
+            t1_v1_from0=t1_thread_result[i];
+            v1_from0=thread_result[i];
+            t1_v2_from0=t1_v0_from0*v1_from0+v0_from0*t1_v1_from0;
+            v2_from0=v0_from0*v1_from0;
+            t1_thread_result[0]=t1_v2_from0;
+            thread_result[0]=v2_from0;
+            i=i+1;
+        }
+    }
+
+    dummy("", (void*)thread_result, (void*)t1_thread_result);
+}

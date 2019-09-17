@@ -1,0 +1,41 @@
+#!/usr/bin/env zsh
+#BSUB -J exclusive_read
+#BSUB -o job%J-exclusive_read.stdout
+#BSUB -e job%J-exclusive_read.stderr
+#BSUB -u foerster@stce.rwth-aachen.de
+#BSUB -N
+#BSUB -R "select[hpcwork]"
+#BSUB -M 1020000
+#BSUB -W 6000
+#BSUB -n 128
+#BSUB -a "bcs openmp"
+#BSUB -x
+echo "Starting job at:";
+date;
+export SPLDIR=/home/mf510951/phd/code/compiler/spl-transformer
+export PAPISRC=/home/mf510951/workspace/external-projects/papi-5.1.0/src
+cd $PAPISRC
+make test
+export testname=exclusive_read
+export SPLcOnHPCWORK=$HPCWORK/spl-transformer-job-$RANDOM
+rsync -av $SPLDIR/ $SPLcOnHPCWORK
+export SPLDIR=$SPLcOnHPCWORK
+cd $SPLcOnHPCWORK;
+module unload gcc
+module unload intel
+module load intel/13.1
+rm -rf CMakeCache.txt CMakeFiles cmake_install*
+cmake CMakeLists.txt && make;
+cd test-suite;
+rm -f hostconfig.txt
+hostname >>  hostconfig.txt; echo >>  hostconfig.txt; echo >>  hostconfig.txt; echo >>  hostconfig.txt;
+cat /proc/cpuinfo >>  hostconfig.txt; echo >>  hostconfig.txt; echo >>  hostconfig.txt; echo >>  hostconfig.txt;
+cat /proc/meminfo >>  hostconfig.txt; echo >>  hostconfig.txt; echo >>  hostconfig.txt; echo >>  hostconfig.txt;
+if [ "$testname" != "test-suite" ]; then cd $testname; fi
+make clean ;
+make scale_test;
+
+echo "Ending job at:";
+date;
+
+

@@ -1,0 +1,47 @@
+Brief description of the exclusive read analysis
+------------------------------------------------
+The analysis is performed for parallel region P.
+entry_point_for_prg_analysis() is the start point for the analysis.
+Here a loop iterates while no fixpoint is reached, this is iterate until all the equations get no new information in the current iteration.
+A nested loop iterates over all equations doing the following:
+	- Take the old_ER, this is the information from the last iteration.
+	- The new_ER for equation i is computed as follows: 	
+		* For each predecssor j where (j,i) in flow(P) compute: phi_j(ER_j)
+		* Compute the JOIN over all phi_j(ER_j) and name the result new_ER.
+	- Compare old_ER and new_ER for equality. Is the new_ER different the new result is stored. Otherwise, we can omit this equation
+      in the future because of monotoncity.
+
+
+Widening and Narrowing:
+The first fixpoint iteration uses widening.
+After a fixpoint has been found, we start another round to narrow the result down.
+Each memory access with an offset index o is examinded whether it is thread unique or not.
+exclusive_read( s ) = all offsets are thread unique.
+
+Transfer function phi():
+------------------------
+case VT_INT_DECLARATION:
+  Case 'a is private': phi(int a) := BOTTOM
+  Case 'a is private': phi(int a gets N) := [N:N]
+  Case 'a is shared': The interval is intialized by [a:a]
+
+case VT_SPL_int_assign:
+  eval(assign, rhs):
+		case omp_get_thread_num():    [THREAD_ID : THREAD_ID]
+		case omp_get_num_threads():   [NUM_OF_THREADS : NUM_OF_THREADS]
+		case VT_SPL_int_const N:      [N:N]
+		case VT_SPL_identifier v:     ER(v)   // we takek the abstract information of variable v
+		case VT_SPL_int_add l+r with l=[a:b] and r=[c:d]:      [a+c:b+d]
+		case VT_SPL_int_sub l+r with l=[a:b] and r=[c:d]:      [a-d:b-c]:
+		case VT_SPL_int_mul:    [ min(a*c, a*d) : max(b*c, b*d) ]
+		case VT_SPL_int_div:    [ min(a/c, a/d) : max(b/c, b/d) ]
+		case VT_SPL_STACKitop:  TOP
+		case VT_SPL_STACKctop:  TOP
+		case VT_SPL_expr_in_brackets:  eval(assign, expression in brackets)
+
+
+case VT_SPL_cond_if:
+case VT_SPL_cond_while:
+	Obtain somehow true_branch and false_branch. 
+	Set the intervals according to the test expression.
+	For example while(i<n){ S1 } S2 leads to (i=[_:n-1]) in S1 and to (i=[n:_]) in S2.

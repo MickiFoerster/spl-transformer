@@ -1,0 +1,2 @@
+./adjoint_scale_test_O0  1>adjoint_scale_test_O0.stdout 2>adjoint_scale_test_O0.stderr
+./adjoint_scale_test_O0_without_ERA 1>adjoint_scale_test_O0_without_ERA.stdout 2>adjoint_scale_test_O0_without_ERA.stderr

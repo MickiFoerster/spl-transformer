@@ -1,0 +1,8 @@
+j=lb; /*@ \label{lst:narrowing:1} @*/
+while(i<=ub) {
+	// Thread processes data at position i.
+	// ...
+	j=ub;/*@ \label{lst:narrowing:2} @*/
+	// ...
+	i=i+1;
+}

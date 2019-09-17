@@ -1,0 +1,206 @@
+/* Copyright (c) 2013, 2014 Michael Foerster, 
+   <Michael.Foerster@com-science.de>
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+%option noyywrap nounput yylineno
+
+%x COMMENT
+
+%{
+#include <iostream>
+#include <cstdarg>
+
+using namespace std;
+
+#include "ast_vertex.h"
+#include "parser.tab.h"
+#include "symbol_table.h"
+
+
+
+void
+info(const string& s, ...)
+{ 
+  #if SPLC_GLOBAL_DEBUG_SWITCH == 1
+	va_list params;
+	va_start(params, s);
+	cerr << yylineno << ": info: "; 
+	vfprintf(stderr, s.c_str(), params);
+	cerr << endl;
+  #endif
+}
+
+void
+yyerror(const string& s, ...)
+{ 
+	va_list params;
+	va_start(params, s);
+	cerr << yylineno << ": error: "; 
+	vfprintf(stderr, s.c_str(), params);
+	cerr << endl;
+}
+
+YY_BUFFER_STATE yy_buffer;
+int in_omp_pragma=0;
+int inside_decl=0;
+extern symbol_table sym_tbl;
+extern ast_vertex* current_lhs;
+extern bool inside_array_index;
+
+void 
+scan_begin(const char * cmd)
+{
+  yy_buffer = yy_scan_string(cmd);
+}
+
+void 
+scan_end ()
+{
+  yy_flush_buffer(yy_buffer);
+  yy_delete_buffer(yy_buffer); 
+}
+
+%}
+
+WS											[\t\ ]+
+EQ											==
+NEQ											!=
+LEQ											<=
+GEQ											>=
+BOOLEAN_OR									"||"
+BOOLEAN_AND									"&&"
+LOWER										<
+GREATER										>
+GETS                                        =
+ADDRESS_OPERATOR							&
+VOID_POINTER_CASTING						"(void*)"
+ASSERT                                      "assert"
+BEFORE_REVERSE_MODE_HOOK                    "before_reverse_mode"
+PUSH                                        "push"
+POP                                         "pop"
+TOP                                         "top"
+EMPTY                                       "empty"
+NOT                                         "!"
+OMP_RUNTIME_FUNC                            ("omp_get_num_threads()"|"omp_get_max_threads()"|"omp_get_thread_num()")
+PRAGMA_OMP                                  "#pragma omp "
+PRAGMA_AD                                   "#pragma ad "
+IDENTIFIER								    [_a-zA-Z][_a-zA-Z0-9]*
+ARRAYINDEX_BEGIN                            \[
+ARRAYINDEX_END                              \]
+INTEGER_CONST								[0-9]+
+FLOAT_CONST									[0-9]+"."[0-9]*
+
+%%
+
+"/*"										{ BEGIN(COMMENT); }
+<COMMENT>"*/"								{ BEGIN(INITIAL); }
+<COMMENT>([^*]|\n)+|.						{}
+<COMMENT><<EOF>>							{ yyerror("Unterminated comment"); return 0;}
+"//".*\n									{}
+{WS}										{}
+\n											{  if(in_omp_pragma) {in_omp_pragma=0; info("PRAGMA_END found");return PRAGMA_END; } }
+{GETS}										{  info("GETS found"); return GETS; }	
+{EQ}										{  info("EQ found"); return EQ; }	
+{NEQ}										{  info("NEQ found"); return NEQ; }	
+{LEQ}										{  info("LEQ found"); return LEQ; }	
+{GEQ}										{  info("GEQ found"); return GEQ; }	
+{BOOLEAN_OR}								{  info("BOOLEAN_OR (||) found"); return BOOLEAN_OR; }	
+{BOOLEAN_AND}								{  info("BOOLEAN_AND (&&) found"); return BOOLEAN_AND; }	
+{LOWER}										{  info("LOWER found"); return LOWER; }	
+{GREATER}									{  info("GREATER found"); return GREATER; }	
+{ASSERT}									{  info("assert found"); return ASSERT; }
+{BEFORE_REVERSE_MODE_HOOK}   				{  info("before_reverse_mode_hook found"); return BEFORE_REVERSE_MODE_HOOK; }
+{PUSH}										{  info("push found"); return PUSH; }	
+{POP}										{  info("pop found"); return POP; }	
+{TOP}										{  info("top found"); return TOP; }	
+{EMPTY}										{  info("empty found"); return EMPTY; }
+{NOT}										{  info("operator NOT found"); return NOT; }
+{ADDRESS_OPERATOR}							{  info("ADDRESS_OPERATOR found"); return ADDRESS_OPERATOR; }
+{VOID_POINTER_CASTING}						{  info("VOID_POINTER_CASTING found"); return VOID_POINTER_CASTING; }
+{OMP_RUNTIME_FUNC}		{ 
+		yylval=new ast_vertex(yylineno, VT_OMP_RUNTIME_ROUTINE, string(yytext));
+		info("OMP_RUNTIME_FUNC found"); 
+		return OMP_RUNTIME_FUNC;
+}
+{PRAGMA_OMP}								{  info("PRAGMA_OMP found"); in_omp_pragma=1;return PRAGMA_OMP; }
+{PRAGMA_AD}									{  info("PRAGMA_AD found"); in_omp_pragma=1;return PRAGMA_AD; }
+"exclusive read failure"					{  info("EXCLUSIVE_READ_FAILURE found"); return EXCLUSIVE_READ_FAILURE; }
+"parallel"									{  info("parallel found"); return PARALLEL; }
+"atomic"									{  info("atomic found"); return ATOMIC; }
+"barrier"									{  info("barrier found"); return BARRIER; }
+"master"									{  info("master found"); return MASTER; }
+"critical"									{  info("critical found"); return CRITICAL; }
+"threadprivate"								{  info("threadprivate found"); return THREADPRIVATE; }
+"if"                                        {  info("if found"); return IF; }
+"while"										{  info("while found"); return WHILE; }
+"for"										{  info("for found"); return FOR; }
+"sin"										{  info("sin found"); return SIN; }
+"cos"										{  info("cos found"); return COS; }
+"exp"										{  info("exp found"); return EXP; }
+"dummy"										{  info("dummy found"); return DUMMY; }
+{INTEGER_CONST}								{  
+						info("INTEGER_CONST found"); 
+						if( !inside_array_index && current_lhs && sym_tbl.is_float(current_lhs->get_str()) ) {
+							info("Converting INTEGER_CONST to FLOAT_CONST."); 
+							yylval=new ast_vertex(yylineno, VT_SPL_float_const, std::string(yytext)+string(".")); 
+							return FLOAT_CONST; 
+						}
+						yylval=new ast_vertex(yylineno, VT_SPL_int_const, std::string(yytext)); 
+						return INTEGER_CONST; 
+		}
+{FLOAT_CONST}								{  info("FLOAT_CONST found"); yylval=new ast_vertex(yylineno, VT_SPL_float_const, std::string(yytext)); return FLOAT_CONST; }
+"unsigned"									{  info("unsigned keyword found"); return UNSIGNED; }
+"int"										{  info("int keyword found"); inside_decl=1; return INT; }
+"double"									{  info("float keyword found"); inside_decl=1; return FLOAT; }
+"Stackc"									{  info("Stackc keyword found"); inside_decl=1; return TYPE_Stackc; }
+"Stacki"									{  info("Stacki keyword found"); inside_decl=1; return TYPE_Stacki; }
+"Stackf"									{  info("Stackf keyword found"); inside_decl=1; return TYPE_Stackf; }
+{ARRAYINDEX_BEGIN}							{  info("ARRAYINDEX_BEGIN found"); return ARRAYINDEX_BEGIN; }  
+{ARRAYINDEX_END}							{  info("ARRAYINDEX_END found"); return ARRAYINDEX_END; }  
+{IDENTIFIER}								{   
+												/* First look for STACK keywork inside the identifier. */
+												string s(yytext);
+												string prefix;
+												size_t pos=s.find("STACK");
+												if(pos!=string::npos) { // If STACK keyword has been found.
+													if(pos==0) { /* STACK without prefix */ }
+													else { // STACK with derivative order as prefix
+														prefix = s.substr(0,pos);
+														s = s.substr(pos);
+													}
+													if(!inside_decl) { assert( sym_tbl.is_defined_symbol(string(prefix+s)) ); }
+													if( s.find("STACKc")==0 )      { info("STACKc found"); yylval=new ast_vertex(yylineno, VT_SPL_STACKc, prefix);  return STACKc; }
+													else if( s.find("STACKi")==0 ) { info("STACKi found"); yylval=new ast_vertex(yylineno, VT_SPL_STACKi, prefix);  return STACKi; }
+													else if( s.find("STACKf")==0 ) { info("STACKf found"); yylval=new ast_vertex(yylineno, VT_SPL_STACKf, prefix);  return STACKf; }
+												}
+												/* When no STACK keywork were found then this is an identifier. */
+												info("IDENTIFIER %s found", yytext); 
+											    yylval=new ast_vertex(yylineno, VT_SPL_identifier, std::string(yytext)); 
+											    return IDENTIFIER; 
+											}
+.											{  info("DEFAULT rule for char: '%c'.", yytext[0]); return yytext[0]; }
+
+
+%%
+
+
+

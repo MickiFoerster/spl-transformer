@@ -1,0 +1,45 @@
+double* x;
+double* A;
+double* thread_result;
+unsigned int n;
+#pragma omp parallel 
+{
+	double  y;
+	double  z;
+	unsigned int tid;
+	unsigned int p;
+	unsigned int c;
+	unsigned int i;
+	unsigned int j;
+	unsigned int lb;
+	unsigned int ub;
+	tid=omp_get_thread_num();
+	p=omp_get_num_threads();
+	c=n/p;
+	lb=tid*c;
+	ub=(tid+1)*c-1;
+	i=lb;
+	z=0.;
+	while(i<=ub) {
+		j=0;
+		y=0.;
+		while(j<n) {
+			y+=A[i*n+j]*x[j];
+			j=j+1;
+		}
+		z+=y;
+		i=i+1;
+	}
+	thread_result[tid]=z;
+	#pragma omp barrier
+	if(tid==0) {
+		i=0;
+		y=0.;
+		while(i<p) {
+			y+=(thread_result[i]);
+			i=i+1;
+		}
+		thread_result[0]=y;
+		dummy("", (void*) thread_result);	
+	}
+}

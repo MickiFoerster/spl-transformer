@@ -1,0 +1,25 @@
+double *x;
+double *A;
+double y;
+int n;
+#pragma omp parallel
+{
+	int tid=0;
+	int p=0;
+	int c=0;
+	int lb=0;
+	int ub=0;
+	int i=0;
+	int j=0;
+
+	tid=omp_get_thread_num();
+	p=omp_get_num_threads();
+	c=n/p;
+	i=c*p;
+	lb=tid*c;
+	ub=(tid+1)*c-1;
+	i=lb;
+	j=i*n+1;
+	y = x[0]*x[0] + x[i]*x[i] + A[i*n+j];
+	// while(i<=ub) { ... ; i=i+1; }
+}

@@ -1,0 +1,89 @@
+double* x;
+double* t1_x;
+double* thread_result;
+double* t1_thread_result;
+int i;
+int n;
+int m;
+int repitions;
+int p;
+#pragma omp parallel for
+for(i=0;i<n;i++)
+{
+    int tid=0;
+    int tests=0;
+    int left=0;
+    int right=0;
+    int above=0;
+    int bottom=0;
+    double y=0.;
+    double t1_y=0.;
+    int nm1=0;
+    double v0_from0;
+    double t1_v0_from0;
+    double v1_from0;
+    double t1_v1_from0;
+    double v2_from0;
+    double t1_v2_from0;
+    double v3_from0;
+    double t1_v3_from0;
+    double v4_from0;
+    double t1_v4_from0;
+    double v5_from0;
+    double t1_v5_from0;
+    double v6_from0;
+    double t1_v6_from0;
+    double v7_from0;
+    double t1_v7_from0;
+    double v8_from0;
+    double t1_v8_from0;
+    tid=omp_get_thread_num();
+    p=omp_get_num_threads();
+    nm1=n-1;
+    left=i-1;
+    if(left<0) {
+        left=i;
+    }
+    right=i+1;
+    if(right>nm1) {
+        right=i;
+    }
+    above=i-n;
+    if(above<0) {
+        above=i;
+    }
+    bottom=i+n;
+    if(bottom>nm1) {
+        bottom=i;
+    }
+    while(tests<repitions) {
+        t1_v0_from0=t1_x[left];
+        v0_from0=x[left];
+        t1_v1_from0=t1_x[right];
+        v1_from0=x[right];
+        t1_v2_from0=t1_v0_from0+t1_v1_from0;
+        v2_from0=v0_from0+v1_from0;
+        t1_v3_from0=t1_x[above];
+        v3_from0=x[above];
+        t1_v4_from0=t1_v2_from0+t1_v3_from0;
+        v4_from0=v2_from0+v3_from0;
+        t1_v5_from0=t1_x[bottom];
+        v5_from0=x[bottom];
+        t1_v6_from0=0.;
+        v6_from0=4.;
+        t1_v7_from0=t1_v5_from0*v6_from0+v5_from0*t1_v6_from0;
+        v7_from0=v5_from0*v6_from0;
+        t1_v8_from0=t1_v4_from0+t1_v7_from0;
+        v8_from0=v4_from0+v7_from0;
+        t1_y=t1_v8_from0;
+        y=v8_from0;
+        if(i==0) {
+            t1_v0_from0=t1_y;
+            v0_from0=y;
+            t1_thread_result[tid]=t1_v0_from0;
+            thread_result[tid]=v0_from0;
+        }
+        tests=tests+1;
+        dummy("", (void*)&y, (void*)&t1_y);
+    }
+}

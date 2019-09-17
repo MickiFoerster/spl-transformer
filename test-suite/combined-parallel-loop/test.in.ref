@@ -1,0 +1,46 @@
+double* x;
+double* thread_result;
+int i;
+int n;
+int m;
+int repitions;
+int p;
+#pragma omp parallel for
+for(i=0;i<n;i++)
+{
+    int tid=0;
+    int tests=0;
+    int left=0;
+    int right=0;
+    int above=0;
+    int bottom=0;
+    double y=0.;
+    int nm1=0;
+    tid=omp_get_thread_num();
+    p=omp_get_num_threads();
+    nm1=n-1;
+    left=i-1;
+    if(left<0) {
+        left=i;
+    }
+    right=i+1;
+    if(right>nm1) {
+        right=i;
+    }
+    above=i-n;
+    if(above<0) {
+        above=i;
+    }
+    bottom=i+n;
+    if(bottom>nm1) {
+        bottom=i;
+    }
+    while(tests<repitions) {
+        y=x[left]+x[right]+x[above]+x[bottom]*4.;
+        if(i==0) {
+            thread_result[tid]=y;
+        }
+        tests=tests+1;
+        dummy("", (void*)&y);
+    }
+}

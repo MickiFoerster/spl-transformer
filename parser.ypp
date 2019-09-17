@@ -1,0 +1,541 @@
+/* Copyright (c) 2013, 2014 Michael Foerster, 
+   <Michael.Foerster@com-science.de>
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+
+
+%{
+#include <iostream>
+#include <cstdlib>
+#include "AST.h"
+
+using namespace std;
+
+extern int yylineno;
+extern int yylex (void);
+extern void info(const std::string& s, ...);
+extern void yyerror(const std::string& s, ...);
+extern int lhs_is_float;
+extern int inside_decl;
+
+std::string src_filename;
+AST ast;
+symbol_table sym_tbl;
+ast_vertex* current_lhs=NULL;
+bool inside_array_index=0;
+int inside_global_declaration_part=1;
+
+#define ASSUME_GLOBAL_DECLARATION  \
+	if( !inside_global_declaration_part ) { \
+		cerr << "error: Declarations without an initialization value is only allowed in the global scope.\n"; \
+		assert( inside_global_declaration_part ); \
+	}
+%}
+
+%token ADDRESS_OPERATOR
+%token VOID_POINTER_CASTING
+%token GETS
+%token EQ
+%token NEQ
+%token LEQ
+%token GEQ
+%token BOOLEAN_OR   BOOLEAN_AND
+%token LOWER   GREATER
+%token STACKf
+%token STACKc
+%token STACKi
+%token ASSERT
+%token BEFORE_REVERSE_MODE_HOOK
+%token PUSH
+%token POP
+%token TOP
+%token EMPTY
+%token NOT
+%token OMP_RUNTIME_FUNC
+%token IDENTIFIER
+%token ARRAYINDEX_BEGIN
+%token ARRAYINDEX_END
+%token PRAGMA_OMP
+%token PRAGMA_END
+%token WHILE
+%token FOR
+%token IF
+%token SIN COS EXP
+%token INTEGER_CONST
+%token FLOAT_CONST
+%token UNSIGNED  INT  FLOAT  TYPE_Stackc  TYPE_Stacki  TYPE_Stackf
+%token DUMMY
+/* pragma AD token */
+%token PRAGMA_AD
+%token EXCLUSIVE_READ_FAILURE
+
+/* OpenMP directives */
+%token PARALLEL
+%token ATOMIC  
+%token THREADPRIVATE
+%token BARRIER
+%token MASTER
+%token CRITICAL
+
+%left  '<' '>'
+%left  '+' '-'
+%left  '*' '/' '%'
+
+%%
+
+spl_code :	
+			seq_of_var_definitions   parallelregion 
+		{ 
+			$1->type=VT_GLOBAL_DECLARATIONS;
+			$1->unparser=&unparser_global_declarations;
+
+			$$=new ast_vertex(yylineno, VT_SPL_CODE, ""); 
+			add_child($$, $1); add_child($$, $2); 
+			ast.init($$); 
+		}
+	;
+
+parallelregion:  
+			PRAGMA_OMP    PARALLEL    PRAGMA_END  { inside_global_declaration_part=0; }
+			'{'   
+				seq_of_var_definitions  
+				seqstmts    
+			'}'		
+		{ 
+			$$=new ast_vertex(yylineno, VT_PARALLEL_REGION, ""); 
+			add_child($$, $6);  $6->set_seq();
+			add_child($$, $7);  $7->set_seq();
+			$$->set_CFG_elements();
+		}
+		|	PRAGMA_OMP    PARALLEL    FOR    PRAGMA_END    { inside_global_declaration_part=0; }
+            FOR '(' for_loop_header ')'
+			'{'   
+				seq_of_var_definitions  
+				seqstmts    
+			'}'		
+		{ 
+			$$=new ast_vertex(yylineno, VT_PARALLEL_FOR_REGION, ""); 
+			add_child($$, $8);
+			add_child($$, $11);  $11->set_seq();
+			add_child($$, $12);  $12->set_seq();
+			$$->set_CFG_elements();
+		}
+		;
+
+for_loop_header :    for_loop_header_init   ';'   for_loop_header_test   ';'    for_loop_header_update 
+	{ 
+		$$=new ast_vertex(yylineno, VT_FOR_LOOP_HEADER, ""); 
+		add_child($$, $1);
+		add_child($$, $3);
+		add_child($$, $5);
+	}
+	;
+
+for_loop_header_init :    
+		assign                 { $$=new ast_vertex(yylineno, VT_FOR_LOOP_HEADER_INIT, ""); add_child($$, $1); }
+	|   for_loop_header_var_definition { $$=new ast_vertex(yylineno, VT_FOR_LOOP_HEADER_INIT, ""); add_child($$, $1); }
+	;
+for_loop_header_test :    testexpr                      { $$=new ast_vertex(yylineno, VT_FOR_LOOP_HEADER_TEST, ""); add_child($$, $1); }
+	;
+for_loop_header_update :  scalar_memref '+' '+'          { $$=new ast_vertex(yylineno, VT_FOR_LOOP_HEADER_UPDATE, ""); add_child($$, $1); }
+	;
+for_loop_header_var_definition : 
+		INT    assign         {$$=new ast_vertex(yylineno, VT_FOR_LOOP_HEADER_VAR_DEF, ""); add_child($$, $2); }
+	;
+
+seq_of_var_definitions :  /* empty */                   { $$=new ast_vertex(yylineno, VT_SEQ_DECLARATIONS, ""); }
+		| 		seq_of_var_definitions	var_definition  { $$=$1; add_child($$, $2);  $2->set_statement(); $$->set_CFG_elements(); }
+	;
+
+var_definition :	
+			INT    scalar_memref   GETS   '-'  INTEGER_CONST       ';'    
+				{ 
+					ast_vertex* tmp=new ast_vertex(yylineno, VT_SPL_int_assign, "");
+					ast_vertex* signed_int = new ast_vertex(0, VT_SPL_int_const, "-" + $5->get_str());
+					add_child(tmp, $2); add_child(tmp, signed_int); 
+					$$=new ast_vertex(yylineno, VT_INT_DECLARATION, "");
+					add_child($$, tmp); 
+					sym_tbl.insert($$, inside_global_declaration_part); 
+					inside_decl=0; 
+				}
+		|	INT    scalar_memref   GETS   INTEGER_CONST       ';'    
+				{ 
+					ast_vertex* tmp=new ast_vertex(yylineno, VT_SPL_int_assign, "");
+					add_child(tmp, $2); add_child(tmp, $4); 
+					$$=new ast_vertex(yylineno, VT_INT_DECLARATION, "");
+					add_child($$, tmp); 
+					sym_tbl.insert($$, inside_global_declaration_part); 
+					inside_decl=0; 
+				}
+		|	UNSIGNED  INT    scalar_memref   GETS   INTEGER_CONST       ';'    
+				{ 
+					ast_vertex* tmp=new ast_vertex(yylineno, VT_SPL_int_assign, "");
+					add_child(tmp, $3); add_child(tmp, $5); 
+					$$=new ast_vertex(yylineno, VT_UINT_DECLARATION, "");
+					add_child($$, tmp); 
+					sym_tbl.insert($$, inside_global_declaration_part); 
+					inside_decl=0; 
+				}
+		|	FLOAT  scalar_memref   GETS   FLOAT_CONST    	   ';'    
+				{ 
+					ast_vertex* tmp=new ast_vertex(yylineno, VT_SPL_float_assign, "");
+					add_child(tmp, $2); add_child(tmp, $4); 
+					$$=new ast_vertex(yylineno, VT_FLOAT_DECLARATION, ""); 
+					add_child($$, tmp); 
+                    sym_tbl.insert($$, inside_global_declaration_part); 
+					inside_decl=0; 
+				}
+		|	FLOAT '*'  scalar_memref        ';'    
+				{ 
+					$$=new ast_vertex(yylineno, VT_FLOAT_POINTER_DECLARATION, ""); 
+					add_child($$, $3); 
+                    sym_tbl.insert($$, inside_global_declaration_part); 
+					inside_decl=0; 
+				}
+		|	INT '*'  scalar_memref        ';'    
+				{ 
+					$$=new ast_vertex(yylineno, VT_INT_POINTER_DECLARATION, ""); 
+					add_child($$, $3); 
+                    sym_tbl.insert($$, inside_global_declaration_part); 
+					inside_decl=0; 
+				}
+		|	INT    scalar_memref  	   ';'    
+				{ 
+					$$=new ast_vertex(yylineno, VT_INT_DECLARATION, ""); 
+					add_child($$, $2); 
+					sym_tbl.insert($$, inside_global_declaration_part); 
+					inside_decl=0; 
+				}
+		|	UNSIGNED  INT    scalar_memref  	   ';'    
+				{ 
+					$$=new ast_vertex(yylineno, VT_UINT_DECLARATION, ""); 
+					add_child($$, $3); 
+					sym_tbl.insert($$, inside_global_declaration_part); 
+					inside_decl=0; 
+				}
+		|	FLOAT  scalar_memref        ';'    
+				{ 
+					$$=new ast_vertex(yylineno, VT_FLOAT_DECLARATION, ""); 
+					add_child($$, $2); 
+                    sym_tbl.insert($$, inside_global_declaration_part); 
+					inside_decl=0; 
+				}
+		|   TYPE_Stackc   STACKc  ';' 
+				{ 
+					$$=new ast_vertex($2->get_line_number(), VT_STACKc_DECLARATION, $2->get_str());
+					delete $2;
+                    sym_tbl.insert($$, inside_global_declaration_part); 
+					inside_decl=0; 
+				}
+		|   TYPE_Stacki   STACKi  ';' 
+				{ 
+					$$=new ast_vertex($2->get_line_number(), VT_STACKi_DECLARATION, $2->get_str());
+					delete $2;
+                    sym_tbl.insert($$, inside_global_declaration_part); 
+					inside_decl=0; 
+				}
+		|   TYPE_Stackf   STACKf  ';' 
+				{ 
+					$$=new ast_vertex($2->get_line_number(), VT_STACKf_DECLARATION, $2->get_str());
+					delete $2;
+                    sym_tbl.insert($$, inside_global_declaration_part); 
+					inside_decl=0; 
+				}
+		|   PRAGMA_OMP    THREADPRIVATE '(' list_of_vars ')' PRAGMA_END 		{ $$=new ast_vertex(yylineno, VT_THREADPRIVATE, ""); add_child($$, $4); }
+	;
+
+seqstmts: 	 stmt                       { $$=new ast_vertex(yylineno, VT_S, ""); if($1!=NULL) { add_child($$, $1); $1->set_statement(); } $$->set_CFG_elements(); }
+		| 	 seqstmts   stmt            { $$=$1; if($2!=NULL) { add_child($$, $2); $2->set_statement(); } $$->set_CFG_elements(); }
+		;
+
+stmt:		
+			assign  ';'              	                    { $$=$1; }
+		|	incremental_assign    ';'                       { $$=$1; }
+        |   BEFORE_REVERSE_MODE_HOOK  '(' ')'  ';' 			{ $$=NULL; /* This hook function is just omitted. */ } 
+        |   STACKc'.'PUSH '(' INTEGER_CONST ')'  ';'        { $$=new ast_vertex($1->get_line_number(), VT_SPL_STACKcpush, $1->get_str()); delete $1; add_child($$, $5); }
+        |   STACKc'.'PUSH '(' scalar_memref ')'  ';'        { $$=new ast_vertex($1->get_line_number(), VT_SPL_STACKcpush, $1->get_str()); delete $1; add_child($$, $5); }
+        |   STACKc'.'POP  '(' ')'  ';'                      { $$=new ast_vertex($1->get_line_number(), VT_SPL_STACKcpop, $1->get_str()); delete $1; }
+        |   STACKi'.'PUSH '(' scalar_memref ')'  ';'        { $$=new ast_vertex($1->get_line_number(), VT_SPL_STACKipush, $1->get_str()); delete $1; add_child($$, $5); }
+        |   STACKi'.'POP  '(' ')'  ';'                      { $$=new ast_vertex($1->get_line_number(), VT_SPL_STACKipop, $1->get_str()); delete $1; }
+        |   STACKf'.'PUSH '(' scalar_memref ')'  ';'        { $$=new ast_vertex($1->get_line_number(), VT_SPL_STACKfpush, $1->get_str()); delete $1; add_child($$, $5); }
+        |   STACKf'.'POP  '(' ')'  ';'                      { $$=new ast_vertex($1->get_line_number(), VT_SPL_STACKfpop, $1->get_str()); }
+		|   ifblock                                         { $$=$1; }
+		|	whileblock                                      { $$=$1; }
+		|	masterconstruct                                 { $$=$1; }
+		|	criticalconstruct                               { $$=$1; }
+        |   DUMMY'(''"''"'',' list_of_dummy_vars ')' ';' 	{ $$=new ast_vertex($1->get_line_number(), VT_DUMMY, ""); add_child($$, $6); }
+		|   atomic_stmt ';'                                 { $$=$1; }
+		|   exclusive_read_stmt ';'                         { $$=$1; }
+		|   worksharing_loop                                { $$=$1; }
+		|   PRAGMA_OMP    BARRIER	PRAGMA_END				{ $$=new ast_vertex(yylineno, VT_BARRIER, ""); }
+        |   ASSERT '(' testexpr ')'  ';'        			{ $$=new ast_vertex($3->get_line_number(), VT_ASSERT, ""); add_child($$, $3); }
+		;
+
+
+worksharing_loop :  PRAGMA_OMP  FOR   PRAGMA_END
+                    assign  ';'
+					whileblock
+		{ $$=new ast_vertex(yylineno, VT_OMP_FOR, ""); add_child($$, $4); add_child($$, $6); $$->set_CFG_elements(); $$->well_formed_loop_test(); }  
+
+
+
+atomic_stmt:     PRAGMA_OMP   ATOMIC   PRAGMA_END
+                 incremental_assign                        { $$=new ast_vertex(yylineno, VT_ATOMIC, ""); add_child($$, $4);  $$->set_CFG_elements(); }
+		;
+exclusive_read_stmt:     
+			PRAGMA_AD   EXCLUSIVE_READ_FAILURE   PRAGMA_END
+            incremental_assign               		 		  	{ $$=new ast_vertex(yylineno, VT_EXCLUSIVE_READ_FAILURE, ""); add_child($$, $4); }
+		|	PRAGMA_AD   EXCLUSIVE_READ_FAILURE   PRAGMA_END
+            assign                       						{ $$=new ast_vertex(yylineno, VT_EXCLUSIVE_READ_FAILURE, ""); add_child($$, $4); }
+		;
+
+seq_test_expressions:   
+			seq_test_expressions    BOOLEAN_OR     testexpr  	{ $$=new ast_vertex(yylineno, VT_SPL_boolean_or, ""); add_child($$,$1); add_child($$, $3); }
+		|	seq_test_expressions    BOOLEAN_AND    testexpr  	{ $$=new ast_vertex(yylineno, VT_SPL_boolean_and, ""); add_child($$,$1); add_child($$, $3); }
+		|	testexpr  											{ $$=$1; }
+	;
+
+testexpr:   
+		|   scalar_memref   testop    FLOAT_CONST               { $$=$2;  add_child($$,$1); add_child($$, $3); }
+		|   scalar_memref   testop    INTEGER_CONST             { $$=$2;  add_child($$,$1); add_child($$, $3); }
+		|   scalar_memref   testop    '-'  INTEGER_CONST        
+				{ 
+					$$=$2;  
+					ast_vertex* signed_int = new ast_vertex(0, VT_SPL_int_const, "-" + $4->get_str()); 
+					add_child($$,$1); 
+					add_child($$, signed_int); 
+				}
+		|   scalar_memref   testop    scalar_memref             { $$=$2;  add_child($$,$1); add_child($$, $3); }
+		|   NOT STACKc'.'EMPTY '(' ')'                      	
+				{ 
+					$$=new ast_vertex(yylineno, VT_SPL_not, "");  
+					ast_vertex* tmp=$2;
+					$2=new ast_vertex(yylineno, VT_SPL_STACKcempty, $2->get_str()); 
+					delete tmp;
+					add_child($$, $2); 
+				}
+		|   STACKc'.'TOP '(' ')' testop 	INTEGER_CONST		
+				{ 
+					$$=$6; 
+					ast_vertex* tmp=$1;
+					$1=new ast_vertex(yylineno, VT_SPL_STACKctop, $1->get_str()); 
+					delete tmp;
+					add_child($$, $1); add_child($$, $7); 
+				}
+		|   STACKc'.'TOP '(' ')' testop 	scalar_memref		'-'		INTEGER_CONST
+				{ 
+					assert( !sym_tbl.is_float($7->get_str()) );
+					ast_vertex *sub=new ast_vertex(yylineno, VT_SPL_int_sub, ""); 
+					add_child(sub, $7); 
+					add_child(sub, $9); 
+
+					$$=$6; 
+					ast_vertex* tmp=$1;
+					$1=new ast_vertex(yylineno, VT_SPL_STACKctop, $1->get_str()); 
+					delete tmp;
+					add_child($$, $1); add_child($$, sub); 
+				}
+		;
+
+testop  : EQ                                               { $$=new ast_vertex(yylineno, VT_SPL_eq, ""); }
+		| NEQ                                              { $$=new ast_vertex(yylineno, VT_SPL_neq, ""); }
+		| LEQ                                              { $$=new ast_vertex(yylineno, VT_SPL_leq, ""); }
+		| GEQ                                              { $$=new ast_vertex(yylineno, VT_SPL_geq, ""); }
+		| LOWER                                            { $$=new ast_vertex(yylineno, VT_SPL_lower, ""); }
+		| GREATER                                          { $$=new ast_vertex(yylineno, VT_SPL_greater, ""); }
+	;
+
+
+
+whileblock : WHILE '('  seq_test_expressions  ')' '{'   seqstmts   '}'       
+				{
+					$$=new ast_vertex(yylineno, VT_SPL_cond_while, ""); 
+					add_child($$, $3); add_child($$, $6); 
+					$$->set_CFG_elements(); 
+					ast.post_processing_test_expressions_to_assertion_mapping.push_back($$); 
+				}
+ifblock    : IF    '('  seq_test_expressions ')' '{'   seqstmts   '}'        
+				{
+					$$=new ast_vertex(yylineno, VT_SPL_cond_if, ""); 
+					add_child($$, $3); add_child($$, $6); 
+					$$->set_CFG_elements(); 
+					ast.post_processing_test_expressions_to_assertion_mapping.push_back($$); 
+				}
+masterconstruct   :  PRAGMA_OMP    MASTER	   PRAGMA_END 
+                 		  '{'   seqstmts   '}'        {  $$=new ast_vertex(yylineno, VT_MASTER, ""); add_child($$, $5); $$->set_CFG_elements();  }
+criticalconstruct :  PRAGMA_OMP    CRITICAL	   PRAGMA_END 
+		                  '{'   seqstmts   '}'        {  $$=new ast_vertex(yylineno, VT_CRITICAL, ""); add_child($$, $5); $$->set_CFG_elements();  }
+
+
+assign :   scalar_memref   { current_lhs=$1; }  GETS       rhs_expr      
+		{  
+			if(sym_tbl.is_float($1->get_str())) {
+				info("Assignment is of type float.");
+				$$=new ast_vertex(yylineno, VT_SPL_float_assign, ""); 
+			}
+			else {
+				info("Assignment is of type int.");
+				$$=new ast_vertex(yylineno, VT_SPL_int_assign, ""); 
+			}
+			add_child($$, $1); add_child($$, $4); 
+			current_lhs=NULL;
+		}
+	;
+
+incremental_assign :   scalar_memref  { current_lhs=$1; }  '+' GETS   rhs_expr      
+		{  
+			assert( sym_tbl.is_float($1->get_str()) );
+			$$=new ast_vertex(yylineno, VT_SPL_float_plus_assign, ""); 
+			add_child($$, $1); add_child($$, $5); 
+			current_lhs=NULL;
+		}
+	;
+
+rhs_expr :
+			scalar_memref      { $$=$1; }
+        |   rhs_expr    '+'   rhs_expr
+			{ 
+				if(sym_tbl.is_float( current_lhs->get_str() )) 
+					$$=new ast_vertex(yylineno, VT_SPL_float_add, ""); 
+				else
+					$$=new ast_vertex(yylineno, VT_SPL_int_add, ""); 
+				add_child($$, $1); 
+				add_child($$, $3); 
+			}
+        |   rhs_expr    '-'    rhs_expr
+			{ 
+				if(sym_tbl.is_float( current_lhs->get_str() )) 
+					$$=new ast_vertex(yylineno, VT_SPL_float_sub, ""); 
+				else
+					$$=new ast_vertex(yylineno, VT_SPL_int_sub, ""); 
+				add_child($$, $1); 
+				add_child($$, $3); 
+			}
+        |   rhs_expr    '*'    rhs_expr
+			{ 
+				if(sym_tbl.is_float( current_lhs->get_str() )) 
+					$$=new ast_vertex(yylineno, VT_SPL_float_mul, ""); 
+				else
+					$$=new ast_vertex(yylineno, VT_SPL_int_mul, ""); 
+				add_child($$, $1); 
+				add_child($$, $3); 
+			}
+        |   rhs_expr    '/'    rhs_expr
+			{ 
+				if(sym_tbl.is_float( current_lhs->get_str() )) 
+					$$=new ast_vertex(yylineno, VT_SPL_float_div, ""); 
+				else
+					$$=new ast_vertex(yylineno, VT_SPL_int_div, ""); 
+				add_child($$, $1); 
+				add_child($$, $3); 
+			}
+        |   rhs_expr    '%'    rhs_expr
+			{ 
+				if(sym_tbl.is_float( current_lhs->get_str() )) {
+					yyerror("error:%d: Modulo operation may not be used in floating-point expression.", yylineno);
+					assert(0);
+				}
+				else
+					$$=new ast_vertex(yylineno, VT_SPL_int_mudolo, ""); 
+				add_child($$, $1); 
+				add_child($$, $3); 
+			}
+        |   SIN '(' rhs_expr ')'          { $$=new ast_vertex(yylineno, VT_SPL_float_sin, ""); add_child($$, $3);}
+        |   COS '(' rhs_expr ')'         { $$=new ast_vertex(yylineno, VT_SPL_float_cos, ""); add_child($$, $3);}
+        |   EXP '(' rhs_expr ')'         { $$=new ast_vertex(yylineno, VT_SPL_float_exp, ""); add_child($$, $3);}
+		|  	FLOAT_CONST                   { $$=$1; }
+		|  	INTEGER_CONST                 { $$=$1; }
+		|  	'-' INTEGER_CONST              { ast_vertex* signed_int = new ast_vertex(0, VT_SPL_int_const, "-" + $2->get_str()); $$=signed_int; }
+        |   STACKf'.'TOP '(' ')'           { $$=new ast_vertex(yylineno, VT_SPL_STACKftop, $1->get_str()); delete $1; }
+        |   STACKi'.'TOP '(' ')'           { $$=new ast_vertex(yylineno, VT_SPL_STACKitop, $1->get_str()); delete $1; }
+        |   STACKc'.'TOP '(' ')'           { $$=new ast_vertex(yylineno, VT_SPL_STACKctop, $1->get_str()); delete $1; }
+        |	OMP_RUNTIME_FUNC   				{ $$=$1; assert(sym_tbl.is_int( current_lhs->get_str() ));}
+		|   '('   rhs_expr   ')'          { $$=new ast_vertex(yylineno, VT_SPL_expr_in_brackets, ""); add_child($$, $2); } 
+/*  The following were intended for the adjoint mode. But I decided to stay easy and to only have unary or binary functions on rhs of assignments.
+		|   '-'   rhs_expr                { OFF: $$=new ast_vertex(yylineno, VT_SPL_expr_negative, ""); add_child($$, $2); } 
+*/
+	;
+
+scalar_memref : IDENTIFIER                  { $$=$1; }
+			|   IDENTIFIER   ARRAYINDEX_BEGIN   { inside_array_index=1; }   array_index   ARRAYINDEX_END   { inside_array_index=0; $$=$1; add_child($$, $4); }
+	;
+
+array_index  :  IDENTIFIER					{ $$=new ast_vertex(yylineno, VT_SPL_array_index, ""); add_child($$, $1); }
+		|  	    INTEGER_CONST               { $$=new ast_vertex(yylineno, VT_SPL_array_index, ""); add_child($$, $1); }
+		| array_index 	'*'		array_index 
+			{
+				ast_vertex* expr=new ast_vertex(yylineno, VT_SPL_int_mul, ""); 
+				add_child(expr, *$1->get_children().begin()); 
+				add_child(expr, *$3->get_children().begin()); 
+				$1->clear_children();
+				delete $3;
+				$$=$1;
+				add_child($$, expr);
+			}
+		| array_index 	'+'		array_index 
+			{
+				ast_vertex* expr=new ast_vertex(yylineno, VT_SPL_int_add, ""); 
+				add_child(expr, *$1->get_children().begin()); 
+				add_child(expr, *$3->get_children().begin()); 
+				$1->clear_children();
+				delete $3;
+				$$=$1;
+				add_child($$, expr);
+			}
+		| array_index 	'-'		array_index 
+			{
+				ast_vertex* expr=new ast_vertex(yylineno, VT_SPL_int_sub, ""); 
+				add_child(expr, *$1->get_children().begin()); 
+				add_child(expr, *$3->get_children().begin()); 
+				$1->clear_children();
+				delete $3;
+				$$=$1;
+				add_child($$, expr);
+			}
+	;
+
+variables_in_list  :  	scalar_memref 		{ $$=$1; }
+				|  		STACKf				{ $$=$1; } 
+				|  		STACKi 				{ $$=$1; }
+				|  		STACKc 				{ $$=$1; }
+	;
+
+list_of_vars : variables_in_list						{ $$=new ast_vertex(yylineno, VT_LIST_OF_VARS, ""); add_child($$, $1); }
+			|  list_of_vars  ','  variables_in_list		{ $$=$1; add_child($$, $3); }
+	;
+
+dummy_variables_in_list  :  	
+                     scalar_memref 							{ $$=$1; }
+				|  	 ADDRESS_OPERATOR      scalar_memref	{ $$=$2; } 
+                |    VOID_POINTER_CASTING  scalar_memref 	{ $$=$2; }
+				|  	 VOID_POINTER_CASTING  ADDRESS_OPERATOR    scalar_memref		{ $$=$3; } 
+
+	;
+
+list_of_dummy_vars :   
+               dummy_variables_in_list						 	{ $$=new ast_vertex(yylineno, VT_LIST_OF_VARS, ""); add_child($$, $1); }
+			|  list_of_dummy_vars  ','  dummy_variables_in_list	{ $$=$1; add_child($$, $3); }
+	;
+%%
+
+
+

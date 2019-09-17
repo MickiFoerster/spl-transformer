@@ -1,0 +1,20 @@
+digraph { 
+0 [label="0: line(0)\ntype(CFG_ENTRY)\n"]
+6 [label="... // same as in Listing 3.3"]
+0 -> 6
+70 [label="70: line(15)\nj=lb\n"]
+6 -> 70
+83 [label="83: line(22)\ntype(SPL_cond_while)\ntest(i<=ub)"]
+70 -> 83
+1000 [label="..."]
+83 -> 1000
+76 [label="76: line(19)\nj=ub\n"]
+1000->76
+1001 [label="..."]
+76 -> 1001
+82 [label="82: line(21)\ni=i+1\n"]
+1001->82
+82 -> 83
+1 [label="1: line(0)\ntype(CFG_EXIT)\n"]
+83 -> 1
+}

@@ -1,0 +1,1 @@
+export SPLDIR=$PWD/..

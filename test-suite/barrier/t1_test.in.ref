@@ -1,0 +1,113 @@
+double* x;
+double* t1_x;
+double* phi;
+double* t1_phi;
+double* constrain;
+double* t1_constrain;
+double L;
+double t1_L=0.;
+double* thread_result;
+double* t1_thread_result;
+int n;
+int nfourth;
+int m;
+#pragma omp parallel
+{
+    int tests=0;
+    double y;
+    double t1_y=0.;
+    int tid;
+    int p;
+    int c;
+    int i;
+    int lb;
+    int ub;
+    int nhalf;
+    double v0_from0;
+    double t1_v0_from0;
+    double v1_from0;
+    double t1_v1_from0;
+    double v2_from0;
+    double t1_v2_from0;
+    double v3_from0;
+    double t1_v3_from0;
+    while(tests<repition) {
+        tid=omp_get_thread_num();
+        p=omp_get_num_threads();
+        nhalf=n/2;
+        c=nhalf/p;
+        i=c*p;
+        if(i!=nhalf) {
+            c=c+1;
+        }
+        lb=tid*c;
+        ub=(tid+1)*c-1;
+        if(ub>=nhalf) {
+            ub=nhalf-1;
+        }
+        i=lb;
+        t1_v0_from0=0.;
+        v0_from0=0.;
+        t1_y=t1_v0_from0;
+        y=v0_from0;
+        while(i<=ub) {
+            t1_v0_from0=t1_y;
+            v0_from0=y;
+            t1_v1_from0=t1_x[i];
+            v1_from0=x[i];
+            t1_v2_from0=t1_v1_from0*cos(v1_from0);
+            v2_from0=sin(v1_from0);
+            t1_v3_from0=t1_v0_from0+t1_v2_from0;
+            v3_from0=v0_from0+v2_from0;
+            t1_y=t1_v3_from0;
+            y=v3_from0;
+            i=i+1;
+        }
+        t1_v0_from0=t1_y;
+        v0_from0=y;
+        t1_thread_result[tid]=t1_v0_from0;
+        thread_result[tid]=v0_from0;
+        t1_v0_from0=0.;
+        v0_from0=0.;
+        t1_y=t1_v0_from0;
+        y=v0_from0;
+        i=0;
+        #pragma omp barrier
+        while(i<p) {
+            t1_v0_from0=t1_thread_result[i];
+            v0_from0=thread_result[i];
+            #pragma omp atomic
+            t1_y+=t1_v0_from0
+            #pragma omp atomic
+            y+=v0_from0
+            i=i+1;
+        }
+        #pragma omp barrier
+        lb=nhalf+tid*c;
+        ub=nhalf+(tid+1)*c-1;
+        if(ub>=n) {
+            ub=n-1;
+        }
+        i=lb;
+        while(i<=ub) {
+            t1_v0_from0=t1_y;
+            v0_from0=y;
+            t1_v1_from0=t1_x[i];
+            v1_from0=x[i];
+            t1_v2_from0=t1_v1_from0*cos(v1_from0);
+            v2_from0=sin(v1_from0);
+            t1_v3_from0=t1_v0_from0*v2_from0+v0_from0*t1_v2_from0;
+            v3_from0=v0_from0*v2_from0;
+            t1_y=t1_v3_from0;
+            y=v3_from0;
+            i=i+1;
+        }
+        t1_v0_from0=t1_y;
+        v0_from0=y;
+        t1_thread_result[tid]=t1_v0_from0;
+        thread_result[tid]=v0_from0;
+        #pragma omp barrier
+        tests=tests+1;
+        dummy("", (void*)thread_result, (void*)&y, (void*)t1_thread_result, (void*)&t1_y);
+    }
+}

@@ -1,0 +1,28 @@
+digraph { 
+1000 [label="..."]
+227 [label="227: line(39)\ntype(SPL_cond_while)\ntest(i<=ub)"]
+1000->227
+92 [label="92: line(26)\ny=0.\n"]
+96 [label="96: line(27)\nj=0\n"]
+92 -> 96
+101 [label="101: line(28)\nk=n-5\n"]
+96 -> 101
+221 [label="221: line(37)\ntype(SPL_cond_while)\ntest(j<=k)"]
+101 -> 221
+211 [label="211: line(34)\ny=A[i*n+j+4]*(x[i]*x[i]*x[i]*x[i])\n+...+A[i*n+j]"]
+215 [label="215: line(35)\nlocal_sum+=y\n"]
+211 -> 215
+220 [label="220: line(36)\nj=j+1\n"]
+215 -> 220
+220 -> 221
+221 -> 211 [label="j<=k"]
+226 [label="226: line(38)\ni=i+1\n"]
+221 -> 226 [label="j>k"]
+226 -> 227
+227 -> 92 [label="i<=ub"]
+232 [label="232: line(40)\nthread_result[tid]+=\nlocal_sum\n"]
+227 -> 232 [label="i>ub"]
+1 [label="1: line(0)\ntype(CFG_EXIT)\n"]
+232 -> 1
+1 [label="1: line(0)\ntype(CFG_EXIT)\n"]
+}

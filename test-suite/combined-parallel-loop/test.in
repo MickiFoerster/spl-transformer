@@ -1,0 +1,23 @@
+double* x;
+double* thread_result;
+int i;
+int n;
+int m;
+int repitions;
+int p;
+#pragma omp parallel for
+for(i=0;i<n;i++)
+{
+	int tid=0;
+	int j=0;
+	double  y=0.;
+
+	tid=omp_get_thread_num();
+	p=omp_get_num_threads();
+	while(j<n) {
+		y = sin(x[i]+x[i]+x[i]+x[i]);
+		if(i==0) { thread_result[tid] = y; }
+		dummy("", (void*) &y);	
+		j=j+1;
+	}
+}
