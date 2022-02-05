@@ -1,4 +1,9 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.1)
+
+project(
+    SPL-Transformer
+  VERSION 1.0
+  LANGUAGES CXX)
 
 find_program(BISON bison)
 find_program(FLEX flex)
@@ -7,7 +12,7 @@ message(STATUS "flex: ${FLEX}")
 message(STATUS "bison: ${BISON}")
 
 # Exec Yacc
-set(BISON_SRC           parser.ypp)
+set(BISON_SRC           ${CMAKE_SOURCE_DIR}/parser.ypp)
 set(BISON_OUT_CPP       parser.tab.cpp)
 set(BISON_OUT_H         parser.tab.h)
 set(BISON_OUT_DOT       parser.dot)
@@ -26,7 +31,7 @@ set(GENERATED_SRCS    ${GENERATED_SRCS}
    )
 
 # Exec Lex
-set(FLEX_SRC scanner.lpp)
+set(FLEX_SRC ${CMAKE_SOURCE_DIR}/scanner.lpp)
 set(FLEX_OUT_CPP scanner.cpp)
 add_custom_command(
 	OUTPUT ${FLEX_OUT_CPP}
