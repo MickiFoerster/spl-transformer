@@ -22,7 +22,7 @@ Actually, it takes a couple of pages to handle all the possible cases.
 * flex 
 * bison
 * cmake
-* make
+* ninja/make (depending on what cmake generates) 
 
 
 
